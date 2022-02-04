@@ -1,11 +1,16 @@
 {
   "name": "ruralnetv2",
   "version": "0.0.1",
+  "engines": {
+    "node": "16.x",
+    "npm": "8.x"
+  },
   "scripts": {
     "dev": "svelte-kit dev",
     "build": "svelte-kit build",
     "package": "svelte-kit package",
-    "preview": "svelte-kit preview"
+    "preview": "svelte-kit preview",
+    "start": "node build/index.js"
   },
   "devDependencies": {
     "@sveltejs/adapter-auto": "next",
