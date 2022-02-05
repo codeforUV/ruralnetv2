@@ -17,7 +17,6 @@ export const handle = async ({ event, resolve }) => {
   if (mongoose.connection.readyState !== 1) {
     console.log("Setting up new database connection for this session");
 
-    // Establish connection to db
     mongoose.connect(MONGODB_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,

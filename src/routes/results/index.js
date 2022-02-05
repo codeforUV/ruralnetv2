@@ -1,10 +1,7 @@
-// import dbConnect from "$lib/db";
 import { SpeedTest } from "$lib/models";
 
 export async function get({ params }) {
   try {
-    // await dbConnect();
-
     const docs = await SpeedTest.find({}).exec();
 
     return {
