@@ -1,7 +1,8 @@
 <script>
-  export let docs;
-  // docs = docs === undefined ? [] : docs;
-  // console.log(docs);
+  // This is the what we get returned to us fom get() inside of routes/results/index.js
+  // Setting a default value of [] in case we don't get anything back so the #each loop
+  // below doesn't crash
+  export let docs = [];
 </script>
 
 <div>
