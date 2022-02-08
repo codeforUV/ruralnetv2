@@ -27,6 +27,10 @@ export const handle = async ({ event, resolve }) => {
     });
   }
 
+  // This cookie checking and setting functionality came with the sveltekit template.
+  // Leaving it here so we can adjust how we were doing cookies before to make them work
+  // with sveltekit. See:
+  // https://blog.logrocket.com/authentication-sveltekit-using-cookies/ for an example
   const cookies = cookie.parse(event.request.headers.get("cookie") || "");
   event.locals.userid = cookies.userid || uuid();
 

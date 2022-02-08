@@ -12,6 +12,6 @@
   <title>Home</title>
 </svelte:head>
 
-<section>
-  <h1 class="text-2xl">This is the home page</h1>
-</section>
+<div
+  class="bg-[url(/images/vt_trees_mtns.jpg)] bg-cover bg-no-repeat bg-center min-h-screen"
+/>

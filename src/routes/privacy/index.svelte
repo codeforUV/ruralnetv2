@@ -1,4 +1,5 @@
 <script>
+  // TODO: Adjust cookie handling and then update this template. See the link in hooks.js
   // import { onMount } from 'svelte';
   // let cookieOK, explicitUserStance;
   // onMount(() => {
@@ -21,12 +22,16 @@
 
 <style>
   button {
-    @apply py-2 px-4 bg-gray-300 border border-black active:bg-gray-400;
+    @apply py-2 px-4 bg-gray-300 border border-black active:bg-gray-400 rounded-lg;
+  }
+  p,
+  li {
+    @apply text-lg;
   }
 </style>
 
 <div class="p-8">
-  <h1 class="text-4xl mb-4">RuralNet Privacy Policy</h1>
+  <h1 class="text-4xl mb-6">RuralNet Privacy Policy</h1>
   <ol class="list-decimal leading-loose pl-6">
     <li>RuralNet and CodeForUV respect your privacy</li>
     <li>
