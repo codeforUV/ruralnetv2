@@ -20,8 +20,8 @@ To run the app locally you'll first need to make sure you have [nodejs](https://
 
 1. Clone this repo: `git clone https://github.com/codeforUV/ruralnetv2.git`  
 2. Install dependencies: `npm install`  (run from inside the project folder)
-3. Configure the mongo connection, by renaming `.env-example` to `.env.local` and paste in the mongodb connection string for `MONGODB_URI` (ask @ejolly)
-4. In the same file paste an api key string for `MAPQUEST_KEY` (@NateDimick has one)
+3. Configure the development environment mongo connection, by renaming `.env-example` to `.env.local` and paste in the mongodb connection string for `VITE_MONGODB_URI` (ask @ejolly or @colbyhemond)
+5. In the same file paste an api key string for `MAPQUEST_KEY` (ask @ejolly or @colbyhemond)
 6. `npm run dev` (launch the server)
 7. Open `http://localhost:3000` in your web browser to see the app
 
