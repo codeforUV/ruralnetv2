@@ -146,78 +146,78 @@ export class RuralTest {
   async prepare() {
     // get ip, isp, time and location
     this.pageInterface.addLogMsg("Preparing Speedtest...");
-    // let previousTestReq = await fetch("speedDB/userInfo.json");
-    // let prevTestMeta = await previousTestReq.json();
-    // if (!prevTestMeta.err) {
-    //   this.pageInterface.addLogMsg("Welcome back! Thanks for testing again");
-    //   this.testData.ipAddress = prevTestMeta.ipAddress;
-    //   this.testData.internetProvider = prevTestMeta.internetProvider;
-    //   this.testData.city = prevTestMeta.city;
-    //   this.testData.latitude = prevTestMeta.latitude;
-    //   this.testData.longitude = prevTestMeta.longitude;
-    //   this.pageInterface.addLogMsg("Metadata copied from last test");
-    // } else {
-    //   this.pageInterface.addLogMsg("Welcome first time tester!");
-    //   this.pageInterface.addLogMsg(
-    //     "Not your first time? You may not have acepted cookies. "
-    //   ); // TODO
-    //   let ipInfoReq = await fetch("id/ipInfo.json");
-    //   let ipInfo = await ipInfoReq.json();
+    let previousTestReq = await fetch("speedDB/userInfo.json");
+    let prevTestMeta = await previousTestReq.json();
+    if (!prevTestMeta.err) {
+      this.pageInterface.addLogMsg("Welcome back! Thanks for testing again");
+      this.testData.ipAddress = prevTestMeta.ipAddress;
+      this.testData.internetProvider = prevTestMeta.internetProvider;
+      this.testData.city = prevTestMeta.city;
+      this.testData.latitude = prevTestMeta.latitude;
+      this.testData.longitude = prevTestMeta.longitude;
+      this.pageInterface.addLogMsg("Metadata copied from last test");
+    } else {
+      this.pageInterface.addLogMsg("Welcome first time tester!");
+      this.pageInterface.addLogMsg(
+        "Not your first time? You may not have acepted cookies. "
+      ); // TODO
+      let ipInfoReq = await fetch("id/ipInfo.json");
+      let ipInfo = await ipInfoReq.json();
 
-    //   this.pageInterface.addLogMsg("Gathering ISP information...");
-    //   this.testData.ipAddress = ipInfo.ip;
-    //   this.testData.internetProvider = ipInfo.org
-    //     ? ipInfo.org.split(" ").slice(1).join(" ")
-    //     : null; // colby 1
+      this.pageInterface.addLogMsg("Gathering ISP information...");
+      this.testData.ipAddress = ipInfo.ip;
+      this.testData.internetProvider = ipInfo.org
+        ? ipInfo.org.split(" ").slice(1).join(" ")
+        : null; // colby 1
 
-    //   this.pageInterface.addLogMsg("Trying to figure out your location...");
-    //   this.pageInterface.addLogMsg(
-    //     '(If your browser asks to access your location, please click "Allow")'
-    //   );
-    //   var ipLatLng = ipInfo.loc ? ipInfo.loc.replace(" ", "") : null; //colby 2
-    //   var browserLatLng = await LocationUtility.browserLocation().catch(
-    //     (err) => {
-    //       // colby 3 possibly add extra error handling
-    //       return err;
-    //     }
-    //   );
+      this.pageInterface.addLogMsg("Trying to figure out your location...");
+      this.pageInterface.addLogMsg(
+        '(If your browser asks to access your location, please click "Allow")'
+      );
+      var ipLatLng = ipInfo.loc ? ipInfo.loc.replace(" ", "") : null; //colby 2
+      var browserLatLng = await LocationUtility.browserLocation().catch(
+        (err) => {
+          // colby 3 possibly add extra error handling
+          return err;
+        }
+      );
 
-    //   let cityreq, chosenLatLng;
-    //   // if (browserLatLng !== "geolocationFailed") {
-    //   //     this.pageInterface.addLogMsg("Using browser geolocation...");
-    //   //     cityreq = await fetch("location/city.json?latlng=" + browserLatLng);
-    //   //     chosenLatLng = browserLatLng;
-    //   // } else {
-    //   //     this.pageInterface.addLogMsg("Using IP geolocation...");
-    //   //     cityreq = await fetch("location/city.json?latlng=" + ipLatLng);
-    //   //     chosenLatLng = ipLatLng;
-    //   // }
-    //   if (browserLatLng !== "geolocationFailed") {
-    //     this.pageInterface.addLogMsg("Using browser geolocation...");
-    //     cityreq = await fetch("location/city.json?latlng=" + browserLatLng);
-    //     chosenLatLng = browserLatLng;
-    //   }
-    //   if (ipLatLng !== null) {
-    //     this.pageInterface.addLogMsg("Using IP geolocation...");
-    //     cityreq = await fetch("location/city.json?latlng=" + ipLatLng);
-    //     chosenLatLng = ipLatLng;
-    //   }
-    //   if (cityreq === undefined) {
-    //     this.pageInterface.addLogMsg("No location found");
-    //   } else {
-    //     chosenLatLng = chosenLatLng.split(",");
-    //     this.testData.latitude = parseFloat(chosenLatLng[0]);
-    //     this.testData.longitude = parseFloat(chosenLatLng[1]);
-    //     let cityInfo = await cityreq.json();
-    //     this.testData.city = `${cityInfo.city}, ${cityInfo.state}`;
-    //   }
-    // }
+      let cityreq, chosenLatLng;
+      if (browserLatLng !== "geolocationFailed") {
+        this.pageInterface.addLogMsg("Using browser geolocation...");
+        cityreq = await fetch("location/city.json?latlng=" + browserLatLng);
+        chosenLatLng = browserLatLng;
+      } else {
+        this.pageInterface.addLogMsg("Using IP geolocation...");
+        cityreq = await fetch("location/city.json?latlng=" + ipLatLng);
+        chosenLatLng = ipLatLng;
+      }
+      if (browserLatLng !== "geolocationFailed") {
+        this.pageInterface.addLogMsg("Using browser geolocation...");
+        cityreq = await fetch("location/city.json?latlng=" + browserLatLng);
+        chosenLatLng = browserLatLng;
+      }
+      if (ipLatLng !== null) {
+        this.pageInterface.addLogMsg("Using IP geolocation...");
+        cityreq = await fetch("location/city.json?latlng=" + ipLatLng);
+        chosenLatLng = ipLatLng;
+      }
+      if (cityreq === undefined) {
+        this.pageInterface.addLogMsg("No location found");
+      } else {
+        chosenLatLng = chosenLatLng.split(",");
+        this.testData.latitude = parseFloat(chosenLatLng[0]);
+        this.testData.longitude = parseFloat(chosenLatLng[1]);
+        let cityInfo = await cityreq.json();
+        this.testData.city = `${cityInfo.city}, ${cityInfo.state}`;
+      }
+    }
 
-    // this.pageInterface.addLogMsg("Finishing preparations...");
-    // this.testData.date = this.today.toISOString().split("T")[0];
-    // this.testData.time = this.today.toISOString().split("T")[1].slice(0, -1);
-    // this.testData.userID = new CookieUtility().getValue("user"); // if the user has explicitly declined cookies, this field will not be included
-    // // then allow testing
+    this.pageInterface.addLogMsg("Finishing preparations...");
+    this.testData.date = this.today.toISOString().split("T")[0];
+    this.testData.time = this.today.toISOString().split("T")[1].slice(0, -1);
+    this.testData.userID = new CookieUtility().getValue("user"); // if the user has explicitly declined cookies, this field will not be included
+    // then allow testing
     this.prepared = true;
   }
   async startTest() {
@@ -312,21 +312,21 @@ export class RuralTestResult {
     window.localStorage.setItem("recentTestDate", Date.now());
   }
   async postTest(update = false) {
-    // const res = await fetch("speedDB/speedDB.json", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify(this._content),
-    // });
-    // if (res.ok) {
-    //   let respJson = await res.json();
-    //   this._content._id = respJson.entryId;
-    //   if (this._saveResults && !update) {
-    //     this.storeTestLocal();
-    //   }
-    //   return true;
-    // }
+    const res = await fetch("speedDB/speedDB.json", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(this._content),
+    });
+    if (res.ok) {
+      let respJson = await res.json();
+      this._content._id = respJson.entryId;
+      if (this._saveResults && !update) {
+        this.storeTestLocal();
+      }
+      return true;
+    }
     return false;
   }
   toggleLocalResultSaving() {
@@ -430,19 +430,19 @@ export class LocationUtility {
   static async verifyLocationInput(userLocationStr) {
     // use internal API to verify that the user has entered a valid location
     // return valid/invalid + coords if valid?
-    // let verifyReq = await fetch(
-    //   `/location/verify.json?location=${userLocationStr}`
-    // );
-    // let verification = await verifyReq.json();
-    // if (verification.verified) {
-    //   console.log("Verified!");
-    //   console.log(verification);
-    //   return verification;
-    // } else {
-    //   console.log("Not Verified!");
-    //   console.log(verification);
-    //   return null;
-    // }
+    let verifyReq = await fetch(
+      `/location/verify.json?location=${userLocationStr}`
+    );
+    let verification = await verifyReq.json();
+    if (verification.verified) {
+      console.log("Verified!");
+      console.log(verification);
+      return verification;
+    } else {
+      console.log("Not Verified!");
+      console.log(verification);
+      return null;
+    }
   }
 }
 
