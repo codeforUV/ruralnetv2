@@ -1,6 +1,11 @@
 import { SpeedTest } from "$lib/models";
+import { dev } from "$app/env";
+
+
 
 export async function get({ params }) {
+
+
   try {
     const docs = await SpeedTest.find({}).exec();
 
