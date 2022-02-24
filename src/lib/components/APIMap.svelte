@@ -6,15 +6,16 @@
         if(browser) {
             const leaflet = await import('leaflet');
 
-            const map = leaflet.map('map').setView([51.505, -0.09], 13);
+            const map = leaflet.map('map').setView([43.827, -72.295], 10);
+            // -72.305, 43.827
 
             leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
 
-            leaflet.marker([51.5, -0.09]).addTo(map)
-                .bindPopup('A pretty CSS3 popup.<br> Easily customizable.')
-                .openPopup();
+            // leaflet.marker([51.5, -0.09]).addTo(map)
+            //     .bindPopup('A pretty CSS3 popup.<br> Easily customizable.')
+            //     .openPopup();
         }
     });
 </script>
