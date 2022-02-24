@@ -2,6 +2,8 @@
     import { onMount } from 'svelte';
     import { browser } from '$app/env';
 
+    export let data = [];
+
     onMount(async () => {
         if(browser) {
             const leaflet = await import('leaflet');
