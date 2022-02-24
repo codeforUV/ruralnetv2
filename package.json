@@ -13,7 +13,6 @@
     "start": "node build/index.js"
   },
   "devDependencies": {
-    "@beyonk/svelte-mapbox": "^8.1.4",
     "@sveltejs/adapter-node": "^1.0.0-next.67",
     "@sveltejs/kit": "next",
     "autoprefixer": "^10.4.2",
@@ -29,6 +28,7 @@
     "@lukeed/uuid": "^2.0.0",
     "cookie": "^0.4.1",
     "dotenv": "^16.0.0",
+    "leaflet": "^1.7.1",
     "mongoose": "^6.2.0"
   }
 }
