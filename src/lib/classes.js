@@ -146,8 +146,9 @@ export class RuralTest {
   async prepare() {
     // get ip, isp, time and location
     this.pageInterface.addLogMsg("Preparing Speedtest...");
-    // let previousTestReq = await fetch("speedDB/userInfo.json");
-    // let prevTestMeta = await previousTestReq.json();
+    let previousTestReq = await fetch("speedDB/userInfo.json");
+    let prevTestMeta = await previousTestReq.json();
+    console.log(prevTestMeta);
     // if (!prevTestMeta.err) {
     //   this.pageInterface.addLogMsg("Welcome back! Thanks for testing again");
     //   this.testData.ipAddress = prevTestMeta.ipAddress;
@@ -163,6 +164,7 @@ export class RuralTest {
     //   ); // TODO
     //   let ipInfoReq = await fetch("id/ipInfo.json");
     //   let ipInfo = await ipInfoReq.json();
+    // }
 
     //   this.pageInterface.addLogMsg("Gathering ISP information...");
     //   this.testData.ipAddress = ipInfo.ip;
@@ -227,21 +229,21 @@ export class RuralTest {
     if (!this.prepared) {
       await this.prepare();
     }
-    this.inProgress = true;
-    this.pageInterface.addLogMsg("Finalizing Speedtest Configuration");
-    this.speedTest.setParameter("garbagePhp_chunkSize", this.chunkSize);
-    this.speedTest.setParameter("test_order", this.testOrder); // no need for IP check, removed upload test from Heroku deploy because it doesn't work w/ heroku
-    this.speedTest.setSelectedServer(SPEEDTEST_SERVERS[0]); // see template.html for SPEEDTEST_SERVERS - there is only one server
-    this.speedTest.onupdate = (data) => {
-      this.onUpdate(data);
-    };
-    // this.speedTest.onend = (data) => { this.onEnd(data) };
-    this.pageInterface.addLogMsg("Starting Speedtest");
-    this.pageInterface.onStart();
-    this.speedTest.start();
-    this.speedTest.onend = (data) => {
-      this.onEnd(data);
-    };
+    // this.inProgress = true;
+    // this.pageInterface.addLogMsg("Finalizing Speedtest Configuration");
+    // this.speedTest.setParameter("garbagePhp_chunkSize", this.chunkSize);
+    // this.speedTest.setParameter("test_order", this.testOrder); // no need for IP check, removed upload test from Heroku deploy because it doesn't work w/ heroku
+    // this.speedTest.setSelectedServer(SPEEDTEST_SERVERS[0]); // see template.html for SPEEDTEST_SERVERS - there is only one server
+    // this.speedTest.onupdate = (data) => {
+    //   this.onUpdate(data);
+    // };
+    // // this.speedTest.onend = (data) => { this.onEnd(data) };
+    // this.pageInterface.addLogMsg("Starting Speedtest");
+    // this.pageInterface.onStart();
+    // this.speedTest.start();
+    // this.speedTest.onend = (data) => {
+    //   this.onEnd(data);
+    // };
   }
   abortTest() {
     this.inProgress = false;
