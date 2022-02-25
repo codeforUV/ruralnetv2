@@ -69,7 +69,13 @@
     state = locationArray[1];
   };
 
-  const handleStartTest = () => {
+  const handleStartTest = async () => {
+    // const resp = await fetch(
+    //   "https://ipgeolocation.abstractapi.com/v1/?api_key=de24077830ea4d369cb85de93599c45c"
+    // );
+    // const data = await resp.json();
+    // console.log(data);
+
     loading = true;
     start = false;
     noPastResults = false;

@@ -144,29 +144,63 @@ export class RuralTest {
     }
   }
   async prepare() {
-    // get ip, isp, time and location
     this.pageInterface.addLogMsg("Preparing Speedtest...");
-    let previousTestReq = await fetch("speedDB/userInfo.json");
+    // Get their IP address by first pinging Abstract API
+    const resp = await fetch(
+      `https://ipgeolocation.abstractapi.com/v1/?api_key=${
+        import.meta.env.VITE_ABSTRACT_API
+      }`
+    );
+    const geolocationData = await resp.json();
+    // Then post this data to our own endpoint to do a db lookup to see if we have a
+    // previous result for them
+    const previousTestReq = await fetch("speedDB/userInfo.json", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(geolocationData),
+    });
     let prevTestMeta = await previousTestReq.json();
-    console.log(prevTestMeta);
-    // if (!prevTestMeta.err) {
-    //   this.pageInterface.addLogMsg("Welcome back! Thanks for testing again");
-    //   this.testData.ipAddress = prevTestMeta.ipAddress;
-    //   this.testData.internetProvider = prevTestMeta.internetProvider;
-    //   this.testData.city = prevTestMeta.city;
-    //   this.testData.latitude = prevTestMeta.latitude;
-    //   this.testData.longitude = prevTestMeta.longitude;
-    //   this.pageInterface.addLogMsg("Metadata copied from last test");
-    // } else {
-    //   this.pageInterface.addLogMsg("Welcome first time tester!");
-    //   this.pageInterface.addLogMsg(
-    //     "Not your first time? You may not have acepted cookies. "
-    //   ); // TODO
-    //   let ipInfoReq = await fetch("id/ipInfo.json");
-    //   let ipInfo = await ipInfoReq.json();
-    // }
+    // If it does exist grab their geodata
+    if (!prevTestMeta.err) {
+      this.pageInterface.addLogMsg("Welcome back! Thanks for testing again");
+      this.testData.ipAddress = prevTestMeta.ipAddress;
+      this.testData.internetProvider = prevTestMeta.internetProvider;
+      this.testData.city = prevTestMeta.city;
+      this.testData.latitude = prevTestMeta.latitude;
+      this.testData.longitude = prevTestMeta.longitude;
+      this.pageInterface.addLogMsg("Metadata copied from last test");
+    } else {
+      // Otherwise save the geodata from our ping to the Abstract API
+      this.pageInterface.addLogMsg("Welcome first time tester!");
+      this.pageInterface.addLogMsg(
+        "Not your first time? You may not have acepted cookies. "
+      );
+      this.testData.ipAddress = geolocationData.ip_address;
+      this.testData.internetProvider = geolocationData.connection.isp_name;
+      this.testData.latitude = parseFloat(geolocationData.latitude);
+      this.testData.longitude = parseFloat(geolocationData.longitude);
+      this.testData.city = `${geolocationData.city}, ${geolocationData.region_iso_code}`;
+      console.log(this.testData);
 
-    //   this.pageInterface.addLogMsg("Gathering ISP information...");
+      // Also try their browser API to get location
+      let browserLatLng;
+      let cityreq, chosenLatLng;
+      try {
+        browserLatLng = await LocationUtility.browserLocation();
+      } catch (error) {
+        console.error(error);
+      }
+      if (browserLatLng !== "geolocationFailed") {
+        this.pageInterface.addLogMsg("Using browser geolocation...");
+        console.log(browserLatLng);
+        // cityreq = await fetch("location/city.json?latlng=" + browserLatLng);
+        // TODO: Handle 400 request
+        // let cityInfo = await cityreq.json()
+        // chosenLatLng = browserLatLng;
+        // this.testData.city = `${cityInfo.city}, ${cityInfo.state}`;
+      }
+    }
+
     //   this.testData.ipAddress = ipInfo.ip;
     //   this.testData.internetProvider = ipInfo.org
     //     ? ipInfo.org.split(" ").slice(1).join(" ")
@@ -184,35 +218,6 @@ export class RuralTest {
     //     }
     //   );
 
-    //   let cityreq, chosenLatLng;
-    //   if (browserLatLng !== "geolocationFailed") {
-    //     this.pageInterface.addLogMsg("Using browser geolocation...");
-    //     cityreq = await fetch("location/city.json?latlng=" + browserLatLng);
-    //     chosenLatLng = browserLatLng;
-    //   } else {
-    //     this.pageInterface.addLogMsg("Using IP geolocation...");
-    //     cityreq = await fetch("location/city.json?latlng=" + ipLatLng);
-    //     chosenLatLng = ipLatLng;
-    //   }
-    //   if (browserLatLng !== "geolocationFailed") {
-    //     this.pageInterface.addLogMsg("Using browser geolocation...");
-    //     cityreq = await fetch("location/city.json?latlng=" + browserLatLng);
-    //     chosenLatLng = browserLatLng;
-    //   }
-    //   if (ipLatLng !== null) {
-    //     this.pageInterface.addLogMsg("Using IP geolocation...");
-    //     cityreq = await fetch("location/city.json?latlng=" + ipLatLng);
-    //     chosenLatLng = ipLatLng;
-    //   }
-    //   if (cityreq === undefined) {
-    //     this.pageInterface.addLogMsg("No location found");
-    //   } else {
-    //     chosenLatLng = chosenLatLng.split(",");
-    //     this.testData.latitude = parseFloat(chosenLatLng[0]);
-    //     this.testData.longitude = parseFloat(chosenLatLng[1]);
-    //     let cityInfo = await cityreq.json();
-    //     this.testData.city = `${cityInfo.city}, ${cityInfo.state}`;
-    //   }
     // }
 
     // this.pageInterface.addLogMsg("Finishing preparations...");
