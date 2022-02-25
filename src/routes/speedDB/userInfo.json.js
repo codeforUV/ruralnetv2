@@ -1,5 +1,9 @@
+// TODO: Consider renaming this route to findUser?
+// This route handles a POST request where it's passed a object containing the output of
+// a call to the Abstract API to get a user's ip address and approximate location
+// We only use their ip address in this end-point along with their user id to see if we
+// have a test for them in the database
 import { SpeedTest } from "$lib/models.js";
-import { getRequestIP, getUserCookie } from "$lib/helpers.js";
 import { parse } from "cookie";
 
 export async function post({ request }) {
@@ -25,7 +29,7 @@ export async function post({ request }) {
     };
   } else {
     return {
-      status: 404,
+      status: 200,
       body: JSON.stringify({
         ipAddress: ip_address,
         uniqueID: userid,

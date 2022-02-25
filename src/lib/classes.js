@@ -95,7 +95,7 @@ export class RuralTest {
     latitude: null,
     longitude: null,
   };
-  constructor(componentIds = null, logs = true) {
+  constructor(componentIds = null, logs = true, userid) {
     this.speedTest = new Speedtest();
     this.today = new Date();
     this.prepared = false;
@@ -119,6 +119,7 @@ export class RuralTest {
     this.pageInterface.onPageLoad();
     this.testData = RuralTest.emptyTestJson;
     this.logging = logs;
+    this.userID = userid;
   }
   get state() {
     return {
@@ -144,95 +145,85 @@ export class RuralTest {
     }
   }
   async prepare() {
-    this.pageInterface.addLogMsg("Preparing Speedtest...");
-    // Get their IP address by first pinging Abstract API
+    this.pageInterface.addLogMsg("BEGIN Speedtest preparation...");
+    this.pageInterface.addLogMsg(
+      "Getting user IP and approximate location from Abstract API"
+    );
     const resp = await fetch(
       `https://ipgeolocation.abstractapi.com/v1/?api_key=${
         import.meta.env.VITE_ABSTRACT_API
       }`
     );
     const geolocationData = await resp.json();
-    // Then post this data to our own endpoint to do a db lookup to see if we have a
-    // previous result for them
+    this.pageInterface.addLogMsg(
+      "Checking db for existing test for this IP + userid"
+    );
     const previousTestReq = await fetch("speedDB/userInfo.json", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(geolocationData),
     });
     let prevTestMeta = await previousTestReq.json();
-    // If it does exist grab their geodata
     if (!prevTestMeta.err) {
-      this.pageInterface.addLogMsg("Welcome back! Thanks for testing again");
+      this.pageInterface.addLogMsg(
+        "Found existing document...copying metadata from last test"
+      );
       this.testData.ipAddress = prevTestMeta.ipAddress;
       this.testData.internetProvider = prevTestMeta.internetProvider;
       this.testData.city = prevTestMeta.city;
       this.testData.latitude = prevTestMeta.latitude;
       this.testData.longitude = prevTestMeta.longitude;
-      this.pageInterface.addLogMsg("Metadata copied from last test");
     } else {
-      // Otherwise save the geodata from our ping to the Abstract API
-      this.pageInterface.addLogMsg("Welcome first time tester!");
       this.pageInterface.addLogMsg(
-        "Not your first time? You may not have acepted cookies. "
+        "No document found...setting up first time test"
       );
       this.testData.ipAddress = geolocationData.ip_address;
       this.testData.internetProvider = geolocationData.connection.isp_name;
       this.testData.latitude = parseFloat(geolocationData.latitude);
       this.testData.longitude = parseFloat(geolocationData.longitude);
       this.testData.city = `${geolocationData.city}, ${geolocationData.region_iso_code}`;
-      console.log(this.testData);
 
-      // Also try their browser API to get location
-      let browserLatLng;
-      let cityreq, chosenLatLng;
+      // User Browser location API + Mapquest to try to get more reliable location
+      let browserCoords;
+      let cityreq, cityInfo;
       try {
-        browserLatLng = await LocationUtility.browserLocation();
+        this.pageInterface.addLogMsg(
+          "Trying browser location API to get more precise location"
+        );
+        browserCoords = await LocationUtility.browserLocation();
       } catch (error) {
         console.error(error);
       }
-      if (browserLatLng !== "geolocationFailed") {
-        this.pageInterface.addLogMsg("Using browser geolocation...");
-        console.log(browserLatLng);
-        // cityreq = await fetch("location/city.json?latlng=" + browserLatLng);
-        // TODO: Handle 400 request
-        // let cityInfo = await cityreq.json()
-        // chosenLatLng = browserLatLng;
-        // this.testData.city = `${cityInfo.city}, ${cityInfo.state}`;
+      if (browserCoords !== "geolocationFailed") {
+        this.pageInterface.addLogMsg(
+          "Got browser lat long...looking up city, state in Mapquest"
+        );
+        this.testData.latitude = browserCoords.latitude;
+        this.testData.longitude = browserCoords.longitude;
+        cityreq = await fetch(
+          `location/city.json?latlng=${browserCoords.latitude},${browserCoords.longitude}`
+        );
+        cityInfo = await cityreq.json();
+        if (JSON.stringify(cityInfo) !== "{}") {
+          this.pageInterface.addLogMsg("Found city...saving");
+          this.testData.city = `${cityInfo.city}, ${cityInfo.state}`;
+        } else {
+          this.pageInterface.addLogMsg(
+            "Could not find city, state in Mapquest"
+          );
+        }
       }
     }
-
-    //   this.testData.ipAddress = ipInfo.ip;
-    //   this.testData.internetProvider = ipInfo.org
-    //     ? ipInfo.org.split(" ").slice(1).join(" ")
-    //     : null; // colby 1
-
-    //   this.pageInterface.addLogMsg("Trying to figure out your location...");
-    //   this.pageInterface.addLogMsg(
-    //     '(If your browser asks to access your location, please click "Allow")'
-    //   );
-    //   var ipLatLng = ipInfo.loc ? ipInfo.loc.replace(" ", "") : null; //colby 2
-    //   var browserLatLng = await LocationUtility.browserLocation().catch(
-    //     (err) => {
-    //       // colby 3 possibly add extra error handling
-    //       return err;
-    //     }
-    //   );
-
-    // }
-
-    // this.pageInterface.addLogMsg("Finishing preparations...");
-    // this.testData.date = this.today.toISOString().split("T")[0];
-    // this.testData.time = this.today.toISOString().split("T")[1].slice(0, -1);
-    // this.testData.userID = new CookieUtility().getValue("user"); // if the user has explicitly declined cookies, this field will not be included
-    // // then allow testing
+    this.pageInterface.addLogMsg("Finishing preparations...");
+    this.testData.date = this.today.toISOString().split("T")[0];
+    this.testData.time = this.today.toISOString().split("T")[1].slice(0, -1);
+    this.testData.userID = this.userID;
     this.prepared = true;
   }
   async startTest() {
-    if (this.logging && this.pageInterface.elements.log.firstChild) {
-      this.pageInterface.clearLog();
-    }
     if (!this.prepared) {
       await this.prepare();
+      this.pageInterface.addLogMsg(this.testData);
     }
     // this.inProgress = true;
     // this.pageInterface.addLogMsg("Finalizing Speedtest Configuration");
@@ -392,14 +383,14 @@ export class LocationUtility {
     let geo = navigator.geolocation;
     return new Promise((resolve, reject) => {
       function successCB(position) {
-        resolve(`${position.coords.latitude},${position.coords.longitude}`);
+        resolve(position.coords);
       }
       function errorCB(error) {
         reject("geolocationFailed");
       }
       const options = {
         enableHighAccuracy: true, // removed timeout browsers like Edge are SLOW on geoloaction.
-        maximunAge: 3000, // result must be newer than 5 seconds prior to location request
+        maximumAge: 0, // result must be newer than 5 seconds prior to location request
       };
       try {
         geo.getCurrentPosition(successCB, errorCB, options);
@@ -521,14 +512,9 @@ export class SpeedTestPageInterface {
   }
   addLogMsg(msg) {
     if (this.logging) {
-      let newLog = document.createElement("li");
-      newLog.textContent = msg;
-      this.elements.log.appendChild(newLog);
-    }
-  }
-  clearLog() {
-    while (this.elements.log.firstChild) {
-      this.elements.log.removeChild(this.elements.log.firstChild);
+      // Just replace with simple console logs so we don't need to presume what the DOM
+      // looks like when the SpeedTest component is used
+      console.log(msg);
     }
   }
 }
