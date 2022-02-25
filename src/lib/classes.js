@@ -105,6 +105,9 @@ export class RuralTest {
     this._state = 0;
     this.chunkSize = 100;
     this.testOrder = "IPDU"; //order in which tests will be performed as a string. D=Download, U=Upload, P=Ping+Jitter, I=IP, _=1 second delay
+    this.auth = import.meta.env.DEV
+      ? import.meta.env.VITE_BACKEND_AUTH
+      : process.env.BACKEND_AUTH;
     if (!componentIds) {
       componentIds = {
         // ids of elements that that speedtest wants to write information to
@@ -150,11 +153,11 @@ export class RuralTest {
     this.pageInterface.addLogMsg(
       "Getting user IP and approximate location from Abstract API"
     );
-    // TODO: Toggle how we read this based on whether we're in dev mode or deployed
+    const key = import.meta.env.DEV
+      ? import.meta.env.VITE_ABSTRACT_API
+      : ABSTRACT_API;
     const resp = await fetch(
-      `https://ipgeolocation.abstractapi.com/v1/?api_key=${
-        import.meta.env.VITE_ABSTRACT_API
-      }`
+      `https://ipgeolocation.abstractapi.com/v1/?api_key=${key}`
     );
     const geolocationData = await resp.json();
     this.pageInterface.addLogMsg(
@@ -313,13 +316,14 @@ export class RuralTestResult {
     window.localStorage.setItem("recentTestDate", Date.now());
   }
   async postTest(update = false) {
-    // const res = await fetch("/api/v1/db", {
+    // TODO: Test me
+    // const res = await fetch("/api/v1/saveTest", {
     //   method: "POST",
     //   headers: {
-    //     "Content-Type": "application/json",
+    //     "Content-Type": "application/json"
     //   },
-    //   body: JSON.stringify(this._content),
-    // });
+    //   body: JSON.stringify(this._content)
+    // })
     // if (res.ok) {
     //   let respJson = await res.json();
     //   this._content._id = respJson.entryId;
@@ -328,7 +332,7 @@ export class RuralTestResult {
     //   }
     //   return true;
     // }
-    return false;
+    // return false;
   }
   toggleLocalResultSaving() {
     this._saveResults = !this._saveResults;

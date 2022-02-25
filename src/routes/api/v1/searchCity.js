@@ -1,14 +1,15 @@
-// This route takes a coordinate pair and will return the name of the town + state
+// PUBLIC API that takes a coordinate pair and will return the name of the town + state
 // that the coordinate is (probably) in by doing a radius search using the Mapquest
-export async function get({ url }) {
+export async function get({ request, url }) {
   const latlng = url.searchParams.get("latlng");
   const numResults = url.searchParams.get("matches") || 3;
 
   let apiReq, searchResults;
   let cityCounts = {};
   if (latlng) {
-    // TODO: Toggle how we read this based on whether we're in dev mode or deployed
-    const key = import.meta.env.VITE_MAPQUEST_KEY;
+    const key = import.meta.env.DEV
+      ? import.meta.env.VITE_MAPQUEST_KEY
+      : process.env.MAPQUEST_KEY;
     let url = `https://www.mapquestapi.com/search/v2/radius?key=${key}&origin=${latlng}&maxMatches=${numResults}`;
     try {
       apiReq = await fetch(url);
@@ -51,10 +52,8 @@ export async function get({ url }) {
     }
   } else {
     return {
-      status: 200,
-      body: JSON.stringify({
-        error: "please provide lat long coordinates as a query param",
-      }),
+      status: 404,
+      body: "latlng query param missing",
     };
   }
 }

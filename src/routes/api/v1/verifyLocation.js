@@ -1,10 +1,11 @@
+/* PUBLIC API that will take a location and verify that its actually a location
+ * if good, returns location and lat/long
+ * if bad, returns error json
+ */
 export async function get({ request, url, params, locals }) {
-  /* this route will take a location and verify that its actually a location
-   * if good, returns location and lat/long
-   * if bad, returns error json
-   */
-  // TODO: fix to reading from vite
-  const key = process.env.MAPQUEST_KEY;
+  const key = import.meta.env.DEV
+    ? import.meta.env.VITE_MAPQUEST_KEY
+    : process.env.MAPQUEST_KEY;
   let location = url.searchParams.get("location");
   if (location) {
     const mapquest = `http://www.mapquestapi.com/geocoding/v1/address?key=${key}&maxResults=1&location=${location}`;
@@ -40,10 +41,8 @@ export async function get({ request, url, params, locals }) {
     };
   } else {
     return {
-      status: 200,
-      body: JSON.stringify({
-        error: "please provide address as a query param",
-      }),
+      status: 404,
+      body: "location query param missing",
     };
   }
 }
