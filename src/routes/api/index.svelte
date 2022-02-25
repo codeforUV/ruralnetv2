@@ -1,7 +1,7 @@
 <script>
   let endpoints = [
     {
-      name: "/api/v1/findUser (POST)",
+      name: "/api/v1/findUser (GET)",
       explanation: "Find a user in the database",
       route: "/api/v1/findUser",
     },

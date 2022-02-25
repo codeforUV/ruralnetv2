@@ -1,4 +1,3 @@
-// TODO: Change to post request?
 export async function get({ request, url, params, locals }) {
   /* this route will take a location and verify that its actually a location
    * if good, returns location and lat/long

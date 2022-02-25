@@ -1,7 +1,6 @@
-// TODO: Change to post request?
+// This route takes a coordinate pair and will return the name of the town + state
+// that the coordinate is (probably) in by doing a radius search using the Mapquest
 export async function get({ url }) {
-  // This route takes a coordinate pair and will return the name of the town + state
-  // that the coordinate is (probably) in by doing a radius search using the Mapquest
   const latlng = url.searchParams.get("latlng");
   const numResults = url.searchParams.get("matches") || 3;
 

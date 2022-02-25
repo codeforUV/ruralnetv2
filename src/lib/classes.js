@@ -160,11 +160,9 @@ export class RuralTest {
     this.pageInterface.addLogMsg(
       "Checking db for existing test for this IP + userid"
     );
-    const previousTestReq = await fetch("/api/v1/findUser", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(geolocationData),
-    });
+    const previousTestReq = await fetch(
+      `/api/v1/findUser?ip=${geolocationData.ip_address}`
+    );
     let prevTestMeta = await previousTestReq.json();
     if (!prevTestMeta.err) {
       this.pageInterface.addLogMsg(

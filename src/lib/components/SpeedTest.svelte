@@ -29,7 +29,9 @@
     speedTest = new RuralTest(null, logging, $session.userid);
 
     //Listen for speed test to finish send back notification to parent
-    //TODO DOMSubtreeModified is obsolete change to MutationObserver - https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
+    //TODO DOMSubtreeModified is obsolete change to MutationObserver -
+    //https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
+    // https://hashnode.com/post/how-to-track-changes-in-the-dom-using-mutation-observer-cj3gck03s0091jhk9yajr4v9t
     doneElement = document.getElementById("done");
     doneElement.addEventListener("DOMSubtreeModified", function () {
       if (doneElement.innerText === "Finished!") {

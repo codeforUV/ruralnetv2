@@ -5,19 +5,9 @@
 import { SpeedTest } from "$lib/models.js";
 import { parse } from "cookie";
 
-export async function get({ request, url, params, locals }) {
-  return {
-    body: {
-      message:
-        "This endpoint is used to find a user and return their test result from the database. Rather than encode IP address as a query param, make a POST request to this endpoint with that data instead.",
-    },
-  };
-}
-
-export async function post({ request }) {
-  const data = await request.json();
+export async function get({ request, url }) {
   const { userid } = parse(request.headers.get("cookie"));
-  const { ip_address } = data;
+  const ip_address = url.searchParams.get("ip") || "";
   const prevTest = await SpeedTest.findOne({
     ipAddress: ip_address,
     userID: userid,
