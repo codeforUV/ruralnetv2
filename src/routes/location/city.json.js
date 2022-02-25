@@ -5,6 +5,7 @@ export async function get({ url }) {
   const latlng = url.searchParams.get("latlng");
   const numResults = url.searchParams.get("matches") || 3;
   if (latlng) {
+    // TODO: Toggle how we read this based on whether we're in dev mode or deployed
     const key = import.meta.env.VITE_MAPQUEST_KEY;
     let url = `https://www.mapquestapi.com/search/v2/radius?key=${key}&origin=${latlng}&maxMatches=${numResults}`;
     let apiReq = await fetch(url);
