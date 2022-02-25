@@ -4,8 +4,21 @@
 
     export let data = [];
 
+    const getPopupContent = (speedTest) => {
+        return(`
+            <div>
+                <div>Ping: ${speedTest.ping}ms<div>
+                <div>Download: ${speedTest.downloadSpeed}Mbps<div>
+                <div>Upload: ${speedTest.uploadSpeed}Mbps<div>
+                <div class="font-bold">${speedTest.city}<div>
+            </div>
+        `)
+    }
+
     onMount(async () => {
         if(browser) {
+
+            const leaflet = await import('leaflet');
 
             const getIcon = (speed) => {
                 const speedIcon = leaflet.icon({
@@ -16,21 +29,17 @@
 
             const determineColorBySpeed = (speed) => {
                 if (speed < 5) {
-                    return 'ff0000' //Red
+                    return 'FF6162' //Red
                 } else if (speed >= 5 && speed < 100) {
-                    return 'FFFF00' //Yellow
+                    return 'FFD972' //Yellow
                 } else if (speed > 100) {
-                    return '00FF00' //Green
+                    return '77A56B' //Green
                 } else {
-                    return '0000FF' //Blue
+                    return '0F528C' //Blue
                 }
             }
 
-            const leaflet = await import('leaflet');
-
             const map = leaflet.map('map').setView([43.827, -72.295], 10);
-            
-            
 
             leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -39,7 +48,14 @@
             if (data) {
                 data.map((speedTest) => {
                     if (speedTest.latitude && speedTest.longitude) {
-                        leaflet.marker([speedTest.latitude, speedTest.longitude], {icon: getIcon(speedTest.downloadSpeed)}).addTo(map)
+
+                        const popupContent = getPopupContent(speedTest)
+
+                        leaflet.marker(
+                            [speedTest.latitude, speedTest.longitude], 
+                            {icon: getIcon(speedTest.downloadSpeed)}
+                        ).addTo(map)
+                         .bindPopup(popupContent)
                     }
                 })
             }
@@ -48,14 +64,9 @@
     });
 </script>
 
-
-<main>
-    <div id="map"></div>
-</main>
-
 <style>
     @import 'https://unpkg.com/leaflet@1.7.1/dist/leaflet.css';
-    main #map {
-        height: 800px;
-    }
 </style>
+
+<div id="map" class='min-h-full min-w-full'></div>
+
