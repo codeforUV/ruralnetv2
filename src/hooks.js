@@ -1,4 +1,4 @@
-import cookie from "cookie";
+import { parse } from "cookie";
 import { v4 as uuid } from "@lukeed/uuid";
 import { dev } from "$app/env";
 import mongoose from "mongoose";
@@ -31,7 +31,7 @@ export const handle = async ({ event, resolve }) => {
   // Leaving it here so we can adjust how we were doing cookies before to make them work
   // with sveltekit. See:
   // https://blog.logrocket.com/authentication-sveltekit-using-cookies/ for an example
-  const cookies = cookie.parse(event.request.headers.get("cookie") || "");
+  const cookies = parse(event.request.headers.get("cookie") || "");
   event.locals.userid = cookies.userid || uuid();
 
   const response = await resolve(event);

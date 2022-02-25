@@ -4,7 +4,7 @@
  */
 
 function getRequestIP(req) {
-  // console.log(req.headers);
+  console.log(req.headers);
   let requestIP =
     req.headers["x-forwarded-for"] ||
     // req.connection.remoteAddress ||
