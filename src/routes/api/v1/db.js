@@ -6,7 +6,7 @@ export async function get({ request, url, params, locals }) {
   try {
     const docs = await SpeedTest.find({}).exec();
     return {
-      body: { docs },
+      body: JSON.stringify({ docs }),
     };
   } catch (err) {
     console.log(err.stack);
