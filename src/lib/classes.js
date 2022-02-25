@@ -12,6 +12,7 @@ const SPEEDTEST_SERVERS = [
 /**
  * A class to make using cookies in the front-end easy
  */
+// TODO: Delete me?
 export class CookieUtility {
   constructor() {
     let rawCookie = document.cookie;
@@ -149,6 +150,7 @@ export class RuralTest {
     this.pageInterface.addLogMsg(
       "Getting user IP and approximate location from Abstract API"
     );
+    // TODO: Toggle how we read this based on whether we're in dev mode or deployed
     const resp = await fetch(
       `https://ipgeolocation.abstractapi.com/v1/?api_key=${
         import.meta.env.VITE_ABSTRACT_API
