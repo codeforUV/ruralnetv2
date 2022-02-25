@@ -1,3 +1,4 @@
+// TODO: Rewrite in sveltekit endpoint style
 export async function get(req, res, next) {
   /* this route will take a location and verify that its actually a location
    * if good, returns location and lat/long

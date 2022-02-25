@@ -50,3 +50,8 @@ export const handle = async ({ event, resolve }) => {
 
   return response;
 };
+
+// Make their user is available in the client-side sveltestore $session
+export const getSession = (request) => {
+  return request.locals;
+};

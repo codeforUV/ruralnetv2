@@ -1,11 +1,12 @@
 <script>
   import { createEventDispatcher, onMount } from "svelte";
   import { RuralTest } from "$lib/classes.js";
+  import { session } from "$app/stores";
 
-  // import FeatherIcon from "./FeatherIcon.svelte";
   import LoadingSpinner from "./LoadingSpinner.svelte";
 
-  export let logging = false;
+  // Run speed test with console logging when in development
+  let logging = import.meta.env.DEV;
   let speedTest;
   let doneElement = null;
   let results = null;
@@ -25,7 +26,7 @@
   const dispatch = createEventDispatcher();
 
   onMount(() => {
-    speedTest = new RuralTest(null, logging);
+    speedTest = new RuralTest(null, logging, $session.userid);
 
     //Listen for speed test to finish send back notification to parent
     //TODO DOMSubtreeModified is obsolete change to MutationObserver - https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
@@ -48,7 +49,6 @@
         } while (time <= 15000);
       }
     });
-    console.log(speedTest);
     if (speedTest.pageInterface) {
       if (speedTest.pageInterface.results === null) {
         noPastResults = true;
@@ -70,12 +70,6 @@
   };
 
   const handleStartTest = async () => {
-    // const resp = await fetch(
-    //   "https://ipgeolocation.abstractapi.com/v1/?api_key=de24077830ea4d369cb85de93599c45c"
-    // );
-    // const data = await resp.json();
-    // console.log(data);
-
     loading = true;
     start = false;
     noPastResults = false;
