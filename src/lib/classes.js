@@ -160,7 +160,7 @@ export class RuralTest {
     this.pageInterface.addLogMsg(
       "Checking db for existing test for this IP + userid"
     );
-    const previousTestReq = await fetch("speedDB/userInfo.json", {
+    const previousTestReq = await fetch("/api/v1/findUser", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(geolocationData),
@@ -203,9 +203,12 @@ export class RuralTest {
         this.testData.latitude = browserCoords.latitude;
         this.testData.longitude = browserCoords.longitude;
         cityreq = await fetch(
-          `location/city.json?latlng=${browserCoords.latitude},${browserCoords.longitude}`
+          `/api/v1/searchCity?latlng=${this.testData.latitude},${this.testData.longitude}`
         );
         cityInfo = await cityreq.json();
+        if (cityInfo.error) {
+          console.error(cityInfo.error);
+        }
         if (JSON.stringify(cityInfo) !== "{}") {
           this.pageInterface.addLogMsg("Found city...saving");
           this.testData.city = `${cityInfo.city}, ${cityInfo.state}`;
@@ -312,7 +315,7 @@ export class RuralTestResult {
     window.localStorage.setItem("recentTestDate", Date.now());
   }
   async postTest(update = false) {
-    // const res = await fetch("speedDB/speedDB.json", {
+    // const res = await fetch("/api/v1/db", {
     //   method: "POST",
     //   headers: {
     //     "Content-Type": "application/json",
@@ -430,8 +433,7 @@ export class LocationUtility {
   static async verifyLocationInput(userLocationStr) {
     // use internal API to verify that the user has entered a valid location
     // return valid/invalid + coords if valid?
-    // let verifyReq = await fetch(
-    //   `/location/verify.json?location=${userLocationStr}`
+    // let verifyReq = await fetch(/api/v1/verifyLocation?location=${userLocationStr}`
     // );
     // let verification = await verifyReq.json();
     // if (verification.verified) {

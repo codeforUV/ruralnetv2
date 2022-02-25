@@ -1,10 +1,18 @@
-// TODO: Consider renaming this route to findUser?
 // This route handles a POST request where it's passed a object containing the output of
 // a call to the Abstract API to get a user's ip address and approximate location
 // We only use their ip address in this end-point along with their user id to see if we
 // have a test for them in the database
 import { SpeedTest } from "$lib/models.js";
 import { parse } from "cookie";
+
+export async function get({ request, url, params, locals }) {
+  return {
+    body: {
+      message:
+        "This endpoint is used to find a user and return their test result from the database. Rather than encode IP address as a query param, make a POST request to this endpoint with that data instead.",
+    },
+  };
+}
 
 export async function post({ request }) {
   const data = await request.json();
