@@ -13,7 +13,7 @@
   class="bg-[url(/images/vt_trees_mtns.jpg)] bg-cover bg-no-repeat bg-center min-h-screen
 flex"
 >
-  <div class="m-auto">
+  <div class="m-auto w-1/2">
     <SpeedTest />
   </div>
 </div>

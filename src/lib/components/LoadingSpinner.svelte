@@ -1,5 +1,5 @@
 <script>
-  export let size = "60";
+  export let size = "80";
   export let unit = "px";
   export let colorOuter = "#FF3E00";
   export let colorCenter = "#40B3FF";
