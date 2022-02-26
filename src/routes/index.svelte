@@ -10,7 +10,10 @@
 </svelte:head>
 
 <div
-  class="bg-[url(/images/vt_trees_mtns.jpg)] bg-cover bg-no-repeat bg-center min-h-screen"
+  class="bg-[url(/images/vt_trees_mtns.jpg)] bg-cover bg-no-repeat bg-center min-h-screen
+flex"
 >
-  <SpeedTest />
+  <div class="m-auto">
+    <SpeedTest />
+  </div>
 </div>

@@ -1,14 +1,5 @@
 import Speedtest from "./speedtest.js";
-const SPEEDTEST_SERVERS = [
-  {
-    name: "RuralNet Server",
-    server: "/test/", //"https://192.168.1.13:3000/",  // /test/ will point to where the speed test backend routes are located in /src
-    dlURL: "garbage.json",
-    ulURL: "empty.json", // "empty.bin", // in speedtest docs, an empty file (like empty.bin) can be a suitable replacement for a real backend - perhaps this gets around heroku h18 503 error "empty.json",
-    pingURL: "empty.json",
-    getIpURL: "getIP.json",
-  },
-];
+import { currentTest } from "$lib/stores";
 /**
  * A class to make using cookies in the front-end easy
  */
@@ -83,6 +74,18 @@ export class RuralTest {
     "finished",
     "aborted",
   ];
+
+  static SPEEDTEST_SERVERS = [
+    {
+      name: "RuralNet Server",
+      server: "/test/", //"https://192.168.1.13:3000/",  // /test/ will point to where the speed test backend routes are located in /src
+      dlURL: "garbage.json",
+      ulURL: "empty.json", // "empty.bin", // in speedtest docs, an empty file (like empty.bin) can be a suitable replacement for a real backend - perhaps this gets around heroku h18 503 error "empty.json",
+      pingURL: "empty.json",
+      getIpURL: "getIP.json",
+    },
+  ];
+
   static emptyTestJson = {
     date: null,
     time: null,
@@ -96,7 +99,8 @@ export class RuralTest {
     latitude: null,
     longitude: null,
   };
-  constructor(componentIds = null, logs = true, userid) {
+
+  constructor(logging = true, userid) {
     this.speedTest = new Speedtest();
     this.today = new Date();
     this.prepared = false;
@@ -105,38 +109,107 @@ export class RuralTest {
     this._state = 0;
     this.chunkSize = 100;
     this.testOrder = "IPDU"; //order in which tests will be performed as a string. D=Download, U=Upload, P=Ping+Jitter, I=IP, _=1 second delay
-    this.auth = import.meta.env.DEV
-      ? import.meta.env.VITE_BACKEND_AUTH
-      : process.env.BACKEND_AUTH;
-    if (!componentIds) {
-      componentIds = {
-        // ids of elements that that speedtest wants to write information to
-        result: "result",
-        title: "title",
-        done: "done",
-        log: "log",
-        testBtn: "test",
-        cancelBtn: "cancel",
-      };
-    }
-    this.pageInterface = new SpeedTestPageInterface(componentIds, logs);
-    this.pageInterface.onPageLoad();
     this.testData = RuralTest.emptyTestJson;
-    this.logging = logs;
+    this.logging = logging;
     this.userID = userid;
+    this.ABSTRACT_API = import.meta.env.DEV
+      ? import.meta.env.VITE_ABSTRACT_API
+      : ABSTRACT_API;
   }
-  get state() {
-    return {
-      prepared: this.prepared,
-      finished: this.finished,
-      inProgress: this.inProgress,
-      stage: RuralTest.testStates[this._state],
-    };
+
+  addLogMsg(msg) {
+    if (this.logging) {
+      console.log(msg);
+    }
   }
-  async getFinished() {
-    console.log("blahhh");
-    // return(this.finished)
+
+  checkLocalForPrevTest() {
+    let prevResults = new RuralTestResult({}, true);
+    if (prevResults._content) {
+      this.addLogMsg("Loading previous local test result");
+      prevResults._content["isPrevTest"] = true;
+      // TODO: Verify these are the right fields for the store
+      currentTest.set(prevResults._content);
+      // const date = new Date(
+      //   `${prevResults._content.date}T${prevResults._content.time}Z`
+      // );
+      // this.elements.result.textContent =
+      //   "Previous Results: " + prevResults.toString();
+      // this.elements.done.textContent = `Last test taken on ${date.toLocaleDateString()} at ${date.toLocaleTimeString()}`;
+    } else {
+      this.addLogMsg("No local test results found");
+    }
   }
+
+  async getIPAndApproxLocation() {
+    this.addLogMsg(
+      "Getting user IP and approximate location from Abstract API"
+    );
+    const resp = await fetch(
+      `https://ipgeolocation.abstractapi.com/v1/?api_key=${this.ABSTRACT_API}`
+    );
+    this.geolocationData = await resp.json();
+  }
+
+  async checkDBForPrevTest() {
+    this.addLogMsg("Checking db for existing test for this IP + userid");
+    const previousTestReq = await fetch(
+      `/api/v1/findUser?ip=${this.geolocationData.ip_address}`
+    );
+    let prevTestMeta = await previousTestReq.json();
+    if (!prevTestMeta.err) {
+      this.addLogMsg(
+        "Found existing document...copying metadata from last test"
+      );
+      this.testData.ipAddress = prevTestMeta.ipAddress;
+      this.testData.internetProvider = prevTestMeta.internetProvider;
+      this.testData.city = prevTestMeta.city;
+      this.testData.latitude = prevTestMeta.latitude;
+      this.testData.longitude = prevTestMeta.longitude;
+    } else {
+      this.addLogMsg("No document found...setting up first time test");
+      this.testData.ipAddress = this.geolocationData.ip_address;
+      this.testData.internetProvider = this.geolocationData.connection.isp_name;
+      this.testData.latitude = parseFloat(this.geolocationData.latitude);
+      this.testData.longitude = parseFloat(this.geolocationData.longitude);
+      this.testData.city = `${this.geolocationData.city}, ${this.geolocationData.region_iso_code}`;
+    }
+  }
+
+  async getPreciseLocation() {
+    // User Browser location API + Mapquest to try to get more reliable location
+    let browserCoords;
+    let cityreq, cityInfo;
+    try {
+      this.addLogMsg(
+        "Trying browser location API to get more precise location"
+      );
+      browserCoords = await LocationUtility.browserLocation();
+    } catch (error) {
+      console.error(error);
+    }
+    if (browserCoords !== "geolocationFailed") {
+      this.addLogMsg(
+        "Got browser lat long...looking up city, state in Mapquest"
+      );
+      this.testData.latitude = browserCoords.latitude;
+      this.testData.longitude = browserCoords.longitude;
+      cityreq = await fetch(
+        `/api/v1/searchCity?latlng=${this.testData.latitude},${this.testData.longitude}`
+      );
+      cityInfo = await cityreq.json();
+      if (cityInfo.error) {
+        console.error(cityInfo.error);
+      }
+      if (JSON.stringify(cityInfo) !== "{}") {
+        this.addLogMsg("Found city...saving");
+        this.testData.city = `${cityInfo.city}, ${cityInfo.state}`;
+      } else {
+        this.addLogMsg("Could not find city, state in Mapquest");
+      }
+    }
+  }
+
   toggleUpload() {
     // turn off
     if (this.testOrder.endsWith("_U")) {
@@ -148,130 +221,75 @@ export class RuralTest {
       return true;
     }
   }
-  async prepare() {
-    this.pageInterface.addLogMsg("BEGIN Speedtest preparation...");
-    this.pageInterface.addLogMsg(
-      "Getting user IP and approximate location from Abstract API"
-    );
-    const key = import.meta.env.DEV
-      ? import.meta.env.VITE_ABSTRACT_API
-      : ABSTRACT_API;
-    const resp = await fetch(
-      `https://ipgeolocation.abstractapi.com/v1/?api_key=${key}`
-    );
-    const geolocationData = await resp.json();
-    this.pageInterface.addLogMsg(
-      "Checking db for existing test for this IP + userid"
-    );
-    const previousTestReq = await fetch(
-      `/api/v1/findUser?ip=${geolocationData.ip_address}`
-    );
-    let prevTestMeta = await previousTestReq.json();
-    if (!prevTestMeta.err) {
-      this.pageInterface.addLogMsg(
-        "Found existing document...copying metadata from last test"
-      );
-      this.testData.ipAddress = prevTestMeta.ipAddress;
-      this.testData.internetProvider = prevTestMeta.internetProvider;
-      this.testData.city = prevTestMeta.city;
-      this.testData.latitude = prevTestMeta.latitude;
-      this.testData.longitude = prevTestMeta.longitude;
-    } else {
-      this.pageInterface.addLogMsg(
-        "No document found...setting up first time test"
-      );
-      this.testData.ipAddress = geolocationData.ip_address;
-      this.testData.internetProvider = geolocationData.connection.isp_name;
-      this.testData.latitude = parseFloat(geolocationData.latitude);
-      this.testData.longitude = parseFloat(geolocationData.longitude);
-      this.testData.city = `${geolocationData.city}, ${geolocationData.region_iso_code}`;
 
-      // User Browser location API + Mapquest to try to get more reliable location
-      let browserCoords;
-      let cityreq, cityInfo;
-      try {
-        this.pageInterface.addLogMsg(
-          "Trying browser location API to get more precise location"
-        );
-        browserCoords = await LocationUtility.browserLocation();
-      } catch (error) {
-        console.error(error);
-      }
-      if (browserCoords !== "geolocationFailed") {
-        this.pageInterface.addLogMsg(
-          "Got browser lat long...looking up city, state in Mapquest"
-        );
-        this.testData.latitude = browserCoords.latitude;
-        this.testData.longitude = browserCoords.longitude;
-        cityreq = await fetch(
-          `/api/v1/searchCity?latlng=${this.testData.latitude},${this.testData.longitude}`
-        );
-        cityInfo = await cityreq.json();
-        if (cityInfo.error) {
-          console.error(cityInfo.error);
-        }
-        if (JSON.stringify(cityInfo) !== "{}") {
-          this.pageInterface.addLogMsg("Found city...saving");
-          this.testData.city = `${cityInfo.city}, ${cityInfo.state}`;
-        } else {
-          this.pageInterface.addLogMsg(
-            "Could not find city, state in Mapquest"
-          );
-        }
-      }
-    }
-    this.pageInterface.addLogMsg("Finishing preparations...");
+  async prepare() {
+    this.addLogMsg("BEGIN Speedtest preparation");
+    await this.getIPAndApproxLocation();
+    await this.checkDBForPrevTest();
+    await this.getPreciseLocation();
     this.testData.date = this.today.toISOString().split("T")[0];
     this.testData.time = this.today.toISOString().split("T")[1].slice(0, -1);
     this.testData.userID = this.userID;
+    // CONFIG SPEED TEST
+    this.speedTest.setParameter("garbagePhp_chunkSize", this.chunkSize);
+    this.speedTest.setParameter("test_order", this.testOrder);
+    this.speedTest.setSelectedServer(RuralTest.SPEEDTEST_SERVERS[0]);
+    // Each time we get new data from a running speed test, update the svelte store
+    // And the class attributes
+    this.speedTest.onupdate = (data) => {
+      const testData = {
+        downloadSpeed: Math.round(data.dlStatus * 10) / 10,
+        uploadSpeed: Math.round(data.ulStatus * 10) / 10,
+        ping: Math.round(data.pingStatus * 10) / 10,
+        state: RuralTest.testStates[data.testState + 1],
+        isPrevTest: false,
+      };
+
+      currentTest.set(testData);
+      this.testData = testData;
+    };
+    // When the speedtest ends call our own onEnd() method
+    this.speedTest.onend = (data) => {
+      this.onEnd(data);
+    };
+
     this.prepared = true;
+    this.addLogMsg("END Speedtest preparation");
   }
+
   async startTest() {
     if (!this.prepared) {
       await this.prepare();
-      this.pageInterface.addLogMsg(this.testData);
     }
-    // this.inProgress = true;
-    // this.pageInterface.addLogMsg("Finalizing Speedtest Configuration");
-    // this.speedTest.setParameter("garbagePhp_chunkSize", this.chunkSize);
-    // this.speedTest.setParameter("test_order", this.testOrder); // no need for IP check, removed upload test from Heroku deploy because it doesn't work w/ heroku
-    // this.speedTest.setSelectedServer(SPEEDTEST_SERVERS[0]); // see template.html for SPEEDTEST_SERVERS - there is only one server
-    // this.speedTest.onupdate = (data) => {
-    //   this.onUpdate(data);
-    // };
-    // // this.speedTest.onend = (data) => { this.onEnd(data) };
-    // this.pageInterface.addLogMsg("Starting Speedtest");
-    // this.pageInterface.onStart();
-    // this.speedTest.start();
-    // this.speedTest.onend = (data) => {
-    //   this.onEnd(data);
-    // };
+    this.addLogMsg("BEGIN Test");
+    this.inProgress = true;
+    this.speedTest.start();
   }
+
   abortTest() {
     this.inProgress = false;
     this.speedTest.abort();
     this.speedTest = new Speedtest();
     this.pageInterface.onAbort();
   }
-  onUpdate(data) {
-    this.testData.downloadSpeed = data.dlStatus;
-    this.testData.uploadSpeed = data.ulStatus;
-    this.testData.ping = data.pingStatus;
-    this._state = data.testState + 1;
-    // this.pageInterface.onUpdate(this.toString(), this._state)
-    this.pageInterface.onUpdate(this.testData, this._state);
-  }
+
   onEnd(aborted) {
+    this.addLogMsg("END Test");
     this.finished = true;
-    this.pageInterface.onEnd(aborted, this.testData);
     if (!aborted) {
       let testResults = new RuralTestResult(this.testData);
-      testResults.postTest();
+      this.addLogMsg(testResults);
+      // TODO: test uploading
+      // testResults.postTest();
+    } else {
+      this.addLogMsg("test aborted");
     }
   }
+
   toString() {
     return new RuralTestResult(this.testData).toString();
   }
+
   getResult() {
     return new RuralTestResult(this.testData);
   }
@@ -447,81 +465,6 @@ export class LocationUtility {
     //   console.log(verification);
     //   return null;
     // }
-  }
-}
-
-/**
- * A wrapper class to make speed test interactions with the DOM cleaner
- * TODO: migrate pieces from speedtest
- */
-export class SpeedTestPageInterface {
-  constructor(elementIds, log = true) {
-    this.elements = {};
-    Object.keys(elementIds).forEach((key) => {
-      this.elements[key] = document.getElementById(elementIds[key]);
-    });
-    this.lastState = "not started";
-    this.logging = log;
-    this.results = null;
-  }
-  getResults() {
-    return this.results;
-  }
-
-  onPageLoad() {
-    let prevResults = new RuralTestResult({}, true);
-    if (prevResults._content && CookieUtility.consentStatus().consented) {
-      this.results = prevResults._content;
-      // const date = new Date(`${prevResults._content.date}T${prevResults._content.time}Z`)
-      // this.elements.result.textContent = "Previous Results: " + prevResults.toString();
-      // this.elements.done.textContent = `Last test taken on ${date.toLocaleDateString()} at ${date.toLocaleTimeString()}`;
-    }
-  }
-  onStart() {
-    if (this.logging) {
-      // this.elements.title.textContent = "Speedtest in progress";
-    }
-    // this.elements.testBtn.disabled = true;
-    // this.elements.cancelBtn.disabled = false;
-  }
-  onUpdate(resultProgress, stateIndex) {
-    let presentState = RuralTest.testStates[stateIndex];
-    if (presentState !== this.lastState) {
-      this.addLogMsg(`Test ${presentState}...`);
-      this.lastState = presentState;
-      this.elements.done.textContent = presentState;
-    }
-    // this.elements.result.textContent = resultProgress;
-    this.results = resultProgress;
-  }
-  onAbort() {
-    this.addLogMsg("Test Aborted by user");
-    // this.elements.cancelBtn.disabled = true;
-    // this.elements.testBtn.disabled = false;
-    this.elements.title.textContent = "Speedtest cancelled";
-  }
-  onEnd(aborted, data) {
-    this.elements.done.textContent =
-      "Finished" + (aborted ? " - Aborted" : "!");
-    // this.elements.testBtn.textContent = 'Click to test again';
-    if (!aborted) {
-      this.addLogMsg("Test Complete!");
-      // this.elements.cancelBtn.disabled = true;
-      // this.elements.testBtn.disabled = false;
-      // this.elements.title.textContent = 'Speedtest Results';
-      // this.elements.result.innerHTML += `, <a href="https://google.com/maps/search/${data.latitude},${data.longitude}">Location: ${data.city}</a>`;
-    }
-  }
-  toggleLogging() {
-    this.logging = !this.logging;
-    return this.logging;
-  }
-  addLogMsg(msg) {
-    if (this.logging) {
-      // Just replace with simple console logs so we don't need to presume what the DOM
-      // looks like when the SpeedTest component is used
-      console.log(msg);
-    }
   }
 }
 

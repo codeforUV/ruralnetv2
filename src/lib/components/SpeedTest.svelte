@@ -2,86 +2,38 @@
   import { createEventDispatcher, onMount } from "svelte";
   import { RuralTest } from "$lib/classes.js";
   import { session } from "$app/stores";
+  import { currentTest } from "$lib/stores";
 
   import LoadingSpinner from "./LoadingSpinner.svelte";
 
   // Run speed test with console logging when in development
   let logging = import.meta.env.DEV;
-  let speedTest;
-  let doneElement = null;
-  let results = null;
-  let ping = 0;
-  let downloadSpeed = 0;
-  let uploadSpeed = 0;
-  let location = "";
-  let locationArray = [];
-  let city = "";
-  let state = "";
-  let start = true;
   let loading = false;
-  let finished = false;
-  let noPastResults = false;
-  let initialLoadOfScreen = true;
 
   const dispatch = createEventDispatcher();
+  const speedTest = new RuralTest(logging, $session.userid);
+
+  let headerText = "";
+  let showStartButton = true;
+
+  $: {
+    if ($currentTest.state === "not started") {
+      headerText = "Take a new test";
+    } else if ($currentTest.state === "finished") {
+      headerText = "Complete";
+      loading = false;
+    }
+  }
 
   onMount(() => {
-    speedTest = new RuralTest(null, logging, $session.userid);
-
-    //Listen for speed test to finish send back notification to parent
-    //TODO DOMSubtreeModified is obsolete change to MutationObserver -
-    //https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
-    // https://hashnode.com/post/how-to-track-changes-in-the-dom-using-mutation-observer-cj3gck03s0091jhk9yajr4v9t
-    doneElement = document.getElementById("done");
-    doneElement.addEventListener("DOMSubtreeModified", function () {
-      if (doneElement.innerText === "Finished!") {
-        loading = false;
-        start = false;
-        finished = true;
-        dispatch("testComplete", true);
-      }
-
-      if (doneElement.innerText === "ping and jitter") {
-        let time = 0;
-        do {
-          time += 10;
-          setTimeout(() => {
-            updateResults(speedTest.pageInterface);
-          }, time);
-        } while (time <= 15000);
-      }
-    });
-    if (speedTest.pageInterface) {
-      if (speedTest.pageInterface.results === null) {
-        noPastResults = true;
-      } else {
-        updateResults(speedTest.pageInterface);
-      }
-    }
+    // Check local storage for a last test result and display it if we have one
+    speedTest.checkLocalForPrevTest();
   });
 
-  const updateResults = async (pageInterface) => {
-    results = pageInterface.results;
-    ping = Math.round(results.ping * 10) / 10;
-    downloadSpeed = Math.round(results.downloadSpeed * 10) / 10;
-    uploadSpeed = Math.round(results.uploadSpeed * 10) / 10;
-    location = results.city;
-    locationArray = location.split(", ");
-    city = locationArray[0];
-    state = locationArray[1];
-  };
-
-  const handleStartTest = async () => {
+  const startTest = async () => {
     loading = true;
-    start = false;
-    noPastResults = false;
-    initialLoadOfScreen = false;
-
-    ping = 0;
-    downloadSpeed = 0;
-    uploadSpeed = 0;
-    location = "";
-
+    showStartButton = false;
+    headerText = "In Progress";
     speedTest.startTest();
   };
 
@@ -91,40 +43,16 @@
 </script>
 
 <style>
-  .results {
-    margin-top: 2em;
-  }
-
-  .status {
-    min-height: 60px;
-    min-width: 60px;
-    margin: 1em;
-  }
-
-  .status div {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
   .speed-metrics-row {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin: 0 0 1em 0;
-    min-height: 70px;
+    @apply flex flex-wrap justify-center mb-2 mx-4;
   }
 
   .speed-metric {
-    margin: 0 1em;
-  }
-
-  .metric-label {
+    @apply my-2 mx-8;
   }
 
   .metric-value {
-    color: black;
-    font-size: 24pt;
+    @apply text-black text-3xl;
   }
 
   .location {
@@ -132,65 +60,61 @@
     font-size: 12pt;
     margin-bottom: 2em;
   }
-
-  #start-speed-test:hover {
-    cursor: pointer;
-  }
 </style>
 
-<p id="done" hidden />
-
-<div class="status">
-  {#if finished === true}
-    <div>
-      <!-- <FeatherIcon iconName="check-circle" size="60" /> -->
-      <p>Complete</p>
-    </div>
-  {:else if loading === true}
-    <div>
+<!-- TODO Fix this flex container so it doesn't change height and width depending on the
+content-->
+<div
+  class="text-center bg-white bg-opacity-60 flex flex-col px-32 py-16 rounded items-center"
+>
+  <h1 class="text-4xl mb-4">{headerText}</h1>
+  <div>
+    {#if showStartButton}
+      <button
+        class="px-4 py-2 bg-blue-500 text-white rounded cursor-pointer"
+        on:click={startTest}>Start</button
+      >
+    {/if}
+    {#if loading}
       <LoadingSpinner />
-      <p>In Progress</p>
-    </div>
-  {:else if start === true}
-    <div on:click={handleStartTest} id="start-speed-test">
-      <!-- <FeatherIcon iconName="play-circle" size="60" /> -->
-      <p>Start Speed Test</p>
-    </div>
-  {/if}
-</div>
-<div class="results">
-  {#if noPastResults === true}
-    <div />
-  {:else}
-    {#if initialLoadOfScreen}
+    {/if}
+  </div>
+
+  <div class="mt-4">
+    {#if $currentTest.isPrevTest}
       <p>Last Speed Test Results:</p>
     {/if}
     <div class="speed-metrics-row">
-      {#if ping}
+      {#if $currentTest.ping}
         <div class="speed-metric">
-          <div id="ping-value" class="metric-value">{ping}</div>
-          <div id="ping-label" class="metric-label">Ping</div>
+          <div class="metric-value">
+            {$currentTest.ping}ms
+          </div>
+          <div>Ping</div>
         </div>
       {/if}
-      {#if downloadSpeed}
+      {#if $currentTest.downloadSpeed}
         <div class="speed-metric">
-          <div id="download-value" class="metric-value">{downloadSpeed}</div>
-          <div id="download-label" class="metric-label">Download</div>
+          <div class="metric-value">
+            {$currentTest.downloadSpeed}
+          </div>
+          <div>Download</div>
         </div>
       {/if}
-      {#if uploadSpeed}
+      {#if $currentTest.uploadSpeed}
         <div class="speed-metric">
-          <div id="upload-value" class="metric-value">{uploadSpeed}</div>
-          <div id="upload-label" class="metric-label">Upload</div>
+          <div class="metric-value">
+            {$currentTest.uploadSpeed}
+          </div>
+          <div>Upload</div>
         </div>
       {/if}
     </div>
-  {/if}
+  </div>
 </div>
-
-<div>
+<!-- <div>
   <p class="location">{location}</p>
-  <!-- {#if !initialLoadOfScreen}
+  {#if !initialLoadOfScreen}
         <LocationUpdate bind:testResult={results}/>
-    {/if} -->
-</div>
+    {/if}
+</div> -->
