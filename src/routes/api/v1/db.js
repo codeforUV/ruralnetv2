@@ -29,6 +29,9 @@ const verifyAuth = (request) => {
 export async function get({ request, url, params, locals }) {
   if (verifyAuth(request)) {
     try {
+      if (import.meta.env.DEV) {
+        console.log("Returning all docs");
+      }
       const docs = await SpeedTest.find({}).exec();
       return {
         status: 200,
@@ -54,6 +57,9 @@ export async function del({ request, url, params, locals }) {
   if (verifyAuth(request)) {
     try {
       const { id } = request.body;
+      if (import.meta.env.DEV) {
+        console.log("Deleting one doc");
+      }
       // NOTE: Commented out by default; uncomment while testing
       // await SpeedTest.deleteOne({ _id: id });
       return {
@@ -76,22 +82,29 @@ export async function del({ request, url, params, locals }) {
 
 export async function post({ request, url, params, locals }) {
   if (verifyAuth(request)) {
-    const data = request.body;
+    const data = await request.json();
     try {
       let newTest, saved;
       // if _id is included, then this test is being updated
       if (data._id) {
+        if (import.meta.env.DEV) {
+          console.log("Updating existing document");
+        }
         await SpeedTest.updateOne({ _id: data._id }, { $set: data }).exec();
         newTest = { _id: data._id };
         saved = newTest;
         // newTest and saved will both be undefined
         // if _id is not included, then it is a fresh new test. _id is automatically assigned by Mongo.
       } else {
+        if (import.meta.env.DEV) {
+          console.log("Saving new document");
+        }
         newTest = new SpeedTest(data);
         saved = await newTest.save();
       }
       if (saved === newTest) {
         return {
+          status: 200,
           body: JSON.stringify({
             resp: "Data saved successfully",
             entryId: newTest._id,

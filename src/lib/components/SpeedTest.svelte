@@ -12,26 +12,40 @@
 
   // Run speed test with console logging when in development
   let logging = import.meta.env.DEV;
+  // Enable data upload by default
+  let upload = false;
   const dispatch = createEventDispatcher();
 
   // Initialize a new instance of the class that handles speed tests
-  const speedTest = new RuralTest(logging, $session.userid);
+  const speedTest = new RuralTest(logging, upload, $session.userid);
 
   // Create some initial values for UI
   let headerText = "Take a new test";
   let showStartButton = true;
   let showSurveyButton = false;
-  let loading = false;
+  let showLastTestDate = false;
+  let buttonText = "Start";
+  let loading = true;
+  $: dateTime = new Date(`${$currentTest.date}T${$currentTest.time}Z`);
+  $: dateText = `Last test taken on ${dateTime.toLocaleDateString()} at ${dateTime.toLocaleTimeString()}`;
 
   // Watches the $currentTest sveltestore and auto-updates the javascript variables in
   // real-time
   $: {
-    if ($currentTest.state === "not started") {
+    if ($currentTest.isPrevTest) {
+      loading = false;
+      showStartButton = true;
+      showSurveyButton = false;
+      showLastTestDate = true;
+      headerText = "Welcome Back!";
+      buttonText = "Take another test";
+    } else if ($currentTest.state === "not started") {
       headerText = "Take a new test";
     } else if ($currentTest.state === "finished") {
       headerText = "Complete";
       loading = false;
       showSurveyButton = true;
+      showLastTestDate = true;
     }
   }
 
@@ -46,7 +60,9 @@
   const startTest = async () => {
     loading = true;
     showStartButton = false;
+    showLastTestDate = false;
     headerText = "In Progress";
+    // Now all the speed test logic and data saving is handled by the RuralTest class
     speedTest.startTest();
   };
 
@@ -62,7 +78,7 @@
 </script>
 
 <div
-  class="grid grid-rows-[repeat(11,_minmax(0,_1fr))] grid-cols-3 bg-white bg-opacity-80 p-4 w-full h-96 text-center
+  class="grid grid-rows-[repeat(12,_minmax(0,_1fr))] grid-cols-3 bg-white bg-opacity-80 p-4 w-full h-96 text-center
 rounded-3xl"
 >
   <!-- Header text row  -->
@@ -82,7 +98,7 @@ rounded-3xl"
     <div class="col-span-3 row-start-4 row-span-3">
       <button
         class="px-8 py-4 bg-blue-500 hover:bg-blue-700 text-white rounded-full cursor-pointer text-3xl"
-        on:click={startTest}>Start</button
+        on:click={startTest}>{buttonText}</button
       >
     </div>
   {/if}
@@ -95,9 +111,16 @@ rounded-3xl"
     </div>
   {/if}
 
+  <!-- Last test date row -->
+  {#if showLastTestDate}
+    <div class="col-span-3 row-start-7 row-span-1">
+      <p>{dateText}</p>
+    </div>
+  {/if}
+
   <!-- Metrics row -->
   {#if $currentTest.ping}
-    <div class="col-span-1 flex flex-col my-auto row-start-7 row-span-3">
+    <div class="col-span-1 flex flex-col my-auto row-start-[8] row-span-3">
       <p class="text-3xl">
         {$currentTest.ping} <span class="text-2xl">ms</span>
       </p>
@@ -105,7 +128,7 @@ rounded-3xl"
     </div>
   {/if}
   {#if $currentTest.downloadSpeed}
-    <div class="col-span-1 flex flex-col my-auto row-start-7 row-span-3">
+    <div class="col-span-1 flex flex-col my-auto row-start-[8] row-span-3">
       <p class="text-3xl">
         {$currentTest.downloadSpeed} <span class="text-2xl">mb/s</span>
       </p>
@@ -113,7 +136,7 @@ rounded-3xl"
     </div>
   {/if}
   {#if $currentTest.uploadSpeed}
-    <div class="col-span-1 flex flex-col my-auto row-start-7 row-span-3">
+    <div class="col-span-1 flex flex-col my-auto row-start-[8] row-span-3">
       <p class="text-3xl">
         {$currentTest.uploadSpeed} <span class="text-2xl">mb/s</span>
       </p>
@@ -122,18 +145,21 @@ rounded-3xl"
   {/if}
 
   <!-- Location row -->
-  {#if $currentTest.location}
+  {#if $currentTest.city}
     <div
-      class="row-start-[10] row-span-1 h-2 col-start-2 text-center text-sm text-gray-500 underline"
+      class="row-start-[11] row-span-1 col-start-2 text-center text-lg text-gray-500 italic "
     >
-      <p>{$currentTest.location}</p>
+      <p>{$currentTest.city}</p>
     </div>
   {/if}
 
   <!-- Link to results map row -->
-  <div
-    class="row-start-[11] row-span-1 h-2 col-start-2 text-center text-sm text-blue-500 underline"
-  >
-    <a href="/results">Skip to Results Map →</a>
-  </div>
+  {#if !loading}
+    <div
+      class="row-start-[12] row-span-1 col-start-2 text-center text-sm text-blue-500
+  underline pt-4"
+    >
+      <a href="/results">Go to Results Map →</a>
+    </div>
+  {/if}
 </div>

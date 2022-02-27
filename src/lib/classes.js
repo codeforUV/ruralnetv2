@@ -31,6 +31,7 @@ export class CookieUtility {
     window.localStorage.setItem("cookieConsent", "false");
     window.localStorage.setItem("cookiesDeclined", new Date().getTime());
     let expiredDate = new Date();
+
     expiredDate.setFullYear(expiredDate.getFullYear() - 1);
     document.cookie = "user=null; Path=/; Expires=" + expiredDate.toUTCString();
   }
@@ -89,6 +90,7 @@ export class RuralTest {
   static emptyTestJson = {
     date: null,
     time: null,
+    localDateTimeString: null,
     userID: null,
     ipAddress: null,
     internetProvider: null,
@@ -100,7 +102,7 @@ export class RuralTest {
     longitude: null,
   };
 
-  constructor(logging = true, userid) {
+  constructor(logging = true, upload = true, userid) {
     this.speedTest = new Speedtest();
     this.today = new Date();
     this.prepared = false;
@@ -111,6 +113,7 @@ export class RuralTest {
     this.testOrder = "IPDU"; //order in which tests will be performed as a string. D=Download, U=Upload, P=Ping+Jitter, I=IP, _=1 second delay
     this.testData = RuralTest.emptyTestJson;
     this.logging = logging;
+    this.upload = upload;
     this.userID = userid;
     this.ABSTRACT_API = import.meta.env.DEV
       ? import.meta.env.VITE_ABSTRACT_API
@@ -128,14 +131,8 @@ export class RuralTest {
     if (prevResults._content) {
       this.addLogMsg("Loading previous local test result");
       prevResults._content["isPrevTest"] = true;
-      // TODO: Verify these are the right fields for the store
+      this.testData = prevResults._content;
       currentTest.set(prevResults._content);
-      // const date = new Date(
-      //   `${prevResults._content.date}T${prevResults._content.time}Z`
-      // );
-      // this.elements.result.textContent =
-      //   "Previous Results: " + prevResults.toString();
-      // this.elements.done.textContent = `Last test taken on ${date.toLocaleDateString()} at ${date.toLocaleTimeString()}`;
     } else {
       this.addLogMsg("No local test results found");
     }
@@ -210,25 +207,15 @@ export class RuralTest {
     }
   }
 
-  toggleUpload() {
-    // turn off
-    if (this.testOrder.endsWith("_U")) {
-      this.testOrder = this.testOrder.substring(0, 3);
-      return false;
-      // turn on
-    } else {
-      this.testOrder += "_U";
-      return true;
-    }
-  }
-
   async prepare() {
+    this.addLogMsg("START");
     this.addLogMsg("BEGIN Speedtest preparation");
     await this.getIPAndApproxLocation();
     await this.checkDBForPrevTest();
     await this.getPreciseLocation();
     this.testData.date = this.today.toISOString().split("T")[0];
     this.testData.time = this.today.toISOString().split("T")[1].slice(0, -1);
+    this.testData.localDateTimeString = this.today.toString();
     this.testData.userID = this.userID;
     // CONFIG SPEED TEST
     this.speedTest.setParameter("garbagePhp_chunkSize", this.chunkSize);
@@ -237,20 +224,17 @@ export class RuralTest {
     // Each time we get new data from a running speed test, update the svelte store
     // And the class attributes
     this.speedTest.onupdate = (data) => {
-      const testData = {
-        downloadSpeed: Math.round(data.dlStatus * 10) / 10,
-        uploadSpeed: Math.round(data.ulStatus * 10) / 10,
-        ping: Math.round(data.pingStatus * 10) / 10,
-        state: RuralTest.testStates[data.testState + 1],
-        isPrevTest: false,
-      };
+      this.testData["downloadSpeed"] = Math.round(data.dlStatus * 10) / 10;
+      this.testData["uploadSpeed"] = Math.round(data.ulStatus * 10) / 10;
+      this.testData["ping"] = Math.round(data.pingStatus * 10) / 10;
+      this.testData["state"] = RuralTest.testStates[data.testState + 1];
+      this.testData["isPrevTest"] = false;
 
-      currentTest.set(testData);
-      this.testData = testData;
+      currentTest.set(this.testData);
     };
     // When the speedtest ends call our own onEnd() method
-    this.speedTest.onend = (data) => {
-      this.onEnd(data);
+    this.speedTest.onend = async (data) => {
+      await this.onEnd(data);
     };
 
     this.prepared = true;
@@ -273,17 +257,21 @@ export class RuralTest {
     this.pageInterface.onAbort();
   }
 
-  onEnd(aborted) {
+  async onEnd(aborted) {
     this.addLogMsg("END Test");
     this.finished = true;
-    if (!aborted) {
-      let testResults = new RuralTestResult(this.testData);
-      this.addLogMsg(testResults);
-      // TODO: test uploading
-      // testResults.postTest();
+    if (this.upload) {
+      if (!aborted) {
+        this.addLogMsg("Saving result...");
+        let testResults = new RuralTestResult(this.testData);
+        await testResults.postTest();
+      } else {
+        this.addLogMsg("test aborted");
+      }
     } else {
-      this.addLogMsg("test aborted");
+      this.addLogMsg("Skipping save result...");
     }
+    this.addLogMsg("DONE!");
   }
 
   toString() {
@@ -301,7 +289,12 @@ export class RuralTest {
 export class RuralTestResult {
   static MILLIDAY = 86400000;
   static TEST_EXPIRY_DAYS = 7;
-  constructor(jsonContent = {}, getLocal = false, saveResults = true) {
+  constructor(
+    jsonContent = {},
+    getLocal = false,
+    saveResults = true,
+    logging = false
+  ) {
     if (getLocal) {
       // get from local window.localStorage
       this._content = RuralTestResult.retrieveTestLocal();
@@ -312,6 +305,12 @@ export class RuralTestResult {
       this._content = {};
     }
     this._saveResults = saveResults;
+    this.logging = logging;
+  }
+  logMsg(msg) {
+    if (this.logging) {
+      console.log(msg);
+    }
   }
   get indentifiers() {
     return {
@@ -334,23 +333,31 @@ export class RuralTestResult {
     window.localStorage.setItem("recentTestDate", Date.now());
   }
   async postTest(update = false) {
-    // TODO: Test me
-    // const res = await fetch("/api/v1/saveTest", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json"
-    //   },
-    //   body: JSON.stringify(this._content)
-    // })
-    // if (res.ok) {
-    //   let respJson = await res.json();
-    //   this._content._id = respJson.entryId;
-    //   if (this._saveResults && !update) {
-    //     this.storeTestLocal();
-    //   }
-    //   return true;
-    // }
-    // return false;
+    this.logMsg("Uploading to db...");
+    try {
+      const res = await fetch("/api/v1/saveTest", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(this._content),
+      });
+
+      let respJson = await res.json();
+      if (res.ok) {
+        this._content._id = respJson.entryId;
+        if (this._saveResults && !update) {
+          this.storeTestLocal();
+        }
+        this.logMsg("Upload successful");
+        return true;
+      } else {
+        this.logMsg("Upload failed");
+      }
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
   }
   toggleLocalResultSaving() {
     this._saveResults = !this._saveResults;
@@ -424,6 +431,8 @@ export class LocationUtility {
       }
     });
   }
+  // TODO: Whenever we build the component for letting a user update their location
+  // manually, we can recycle some of the logic here. So leaving this class
   async updateLocation(newLocation) {
     // given a test ID and newLocation (zip code or city, state)
     // verify that newLocation is valid

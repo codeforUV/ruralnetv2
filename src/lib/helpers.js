@@ -5,7 +5,7 @@
 
 // Make an authenticated request against the /api/db endpoint by setting the value of
 // the request header based on the BACKEND_AUTH key known only to the server
-export const makeAuthenticatedReq = async (request, method) => {
+export const makeAuthenticatedReq = async (req, method) => {
   const endpoint = import.meta.env.DEV
     ? import.meta.env.VITE_BACKEND_URL
     : process.env.BACKEND_URL;
@@ -21,9 +21,10 @@ export const makeAuthenticatedReq = async (request, method) => {
       credentials: "same-origin",
     },
   };
-
   if (method === "POST") {
-    options["body"] = request.body;
+    options["method"] = method;
+    options["body"] = await req.request.json();
+    options.body = JSON.stringify(options.body);
   }
   return fetch(url, options);
 };
