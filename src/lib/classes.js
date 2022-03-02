@@ -115,9 +115,12 @@ export class RuralTest {
     this.logging = logging;
     this.upload = upload;
     this.userID = userid;
-    this.ABSTRACT_API = import.meta.env.DEV
-      ? import.meta.env.VITE_ABSTRACT_API
-      : process.env.ABSTRACT_API;
+    // Hard-coding the abstract API key in the front-end...not great but also not a huge
+    // security issue for now because we don't have any billing associated with it or
+    // other account info. Worse case we run out of free monthly quota
+    // Replace this when we get easily get client request IP in sveltekit. See:
+    // https://github.com/sveltejs/kit/pull/3993
+    this.ABSTRACT_API = "de24077830ea4d369cb85de93599c45c";
   }
 
   addLogMsg(msg) {
