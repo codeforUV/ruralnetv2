@@ -4,7 +4,20 @@ import adapter from "@sveltejs/adapter-node";
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
   kit: {
-    adapter: adapter(),
+    adapter: adapter({
+      env: {
+        origin: "ORIGIN",
+        headers: {
+          protocol: "PROTOCOL_HEADER",
+          host: "HOST_HEADER",
+        },
+      },
+    }),
+    vite: {
+      define: {
+        "process.env": process.env,
+      },
+    },
   },
 
   preprocess: [
