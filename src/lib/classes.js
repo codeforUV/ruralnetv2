@@ -117,7 +117,7 @@ export class RuralTest {
     this.userID = userid;
     this.ABSTRACT_API = import.meta.env.DEV
       ? import.meta.env.VITE_ABSTRACT_API
-      : ABSTRACT_API;
+      : process.env.ABSTRACT_API;
   }
 
   addLogMsg(msg) {
