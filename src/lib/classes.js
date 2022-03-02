@@ -142,34 +142,47 @@ export class RuralTest {
     this.addLogMsg(
       "Getting user IP and approximate location from Abstract API"
     );
-    const resp = await fetch(
-      `https://ipgeolocation.abstractapi.com/v1/?api_key=${this.ABSTRACT_API}`
-    );
-    this.geolocationData = await resp.json();
+    try {
+      const resp = await fetch(
+        `https://ipgeolocation.abstractapi.com/v1/?api_key=${this.ABSTRACT_API}`
+      );
+      this.geolocationData = await resp.json();
+      return true;
+    } catch (error) {
+      this.testData.errorText = `Failed to get IP and approximate location from abstract API: ${error}`;
+      return false;
+    }
   }
 
   async checkDBForPrevTest() {
     this.addLogMsg("Checking db for existing test for this IP + userid");
-    const previousTestReq = await fetch(
-      `/api/v1/findUser?ip=${this.geolocationData.ip_address}`
-    );
-    let prevTestMeta = await previousTestReq.json();
-    if (!prevTestMeta.err) {
-      this.addLogMsg(
-        "Found existing document...copying metadata from last test"
+    try {
+      const previousTestReq = await fetch(
+        `/api/v1/findUser?ip=${this.geolocationData.ip_address}`
       );
-      this.testData.ipAddress = prevTestMeta.ipAddress;
-      this.testData.internetProvider = prevTestMeta.internetProvider;
-      this.testData.city = prevTestMeta.city;
-      this.testData.latitude = prevTestMeta.latitude;
-      this.testData.longitude = prevTestMeta.longitude;
-    } else {
-      this.addLogMsg("No document found...setting up first time test");
-      this.testData.ipAddress = this.geolocationData.ip_address;
-      this.testData.internetProvider = this.geolocationData.connection.isp_name;
-      this.testData.latitude = parseFloat(this.geolocationData.latitude);
-      this.testData.longitude = parseFloat(this.geolocationData.longitude);
-      this.testData.city = `${this.geolocationData.city}, ${this.geolocationData.region_iso_code}`;
+      let prevTestMeta = await previousTestReq.json();
+      if (!prevTestMeta.err) {
+        this.addLogMsg(
+          "Found existing document...copying metadata from last test"
+        );
+        this.testData.ipAddress = prevTestMeta.ipAddress;
+        this.testData.internetProvider = prevTestMeta.internetProvider;
+        this.testData.city = prevTestMeta.city;
+        this.testData.latitude = prevTestMeta.latitude;
+        this.testData.longitude = prevTestMeta.longitude;
+      } else {
+        this.addLogMsg("No document found...setting up first time test");
+        this.testData.ipAddress = this.geolocationData.ip_address;
+        this.testData.internetProvider =
+          this.geolocationData.connection.isp_name;
+        this.testData.latitude = parseFloat(this.geolocationData.latitude);
+        this.testData.longitude = parseFloat(this.geolocationData.longitude);
+        this.testData.city = `${this.geolocationData.city}, ${this.geolocationData.region_iso_code}`;
+      }
+      return true;
+    } catch (error) {
+      this.testData.errorText = `Failed to look up existing test in db; ${error}`;
+      return false;
     }
   }
 
@@ -182,72 +195,87 @@ export class RuralTest {
         "Trying browser location API to get more precise location"
       );
       browserCoords = await LocationUtility.browserLocation();
+      if (browserCoords !== "geolocationFailed") {
+        this.addLogMsg(
+          "Got browser lat long...looking up city, state in Mapquest"
+        );
+        this.testData.latitude = browserCoords.latitude;
+        this.testData.longitude = browserCoords.longitude;
+        cityreq = await fetch(
+          `/api/v1/searchCity?latlng=${this.testData.latitude},${this.testData.longitude}`
+        );
+        cityInfo = await cityreq.json();
+        if (cityInfo.error) {
+          console.error(cityInfo.error);
+        }
+        if (JSON.stringify(cityInfo) !== "{}") {
+          this.addLogMsg("Found city...saving");
+          this.testData.city = `${cityInfo.city}, ${cityInfo.state}`;
+          this.testData.locationPrecision = "precise";
+        } else {
+          this.addLogMsg("Could not find city, state in Mapquest");
+          this.testData.locationPrecision = "error";
+        }
+      }
     } catch (error) {
-      console.error(error);
-    }
-    if (browserCoords !== "geolocationFailed") {
-      this.addLogMsg(
-        "Got browser lat long...looking up city, state in Mapquest"
-      );
-      this.testData.latitude = browserCoords.latitude;
-      this.testData.longitude = browserCoords.longitude;
-      cityreq = await fetch(
-        `/api/v1/searchCity?latlng=${this.testData.latitude},${this.testData.longitude}`
-      );
-      cityInfo = await cityreq.json();
-      if (cityInfo.error) {
-        console.error(cityInfo.error);
+      if (error != "geolocationFailed") {
+        console.error(error);
       }
-      if (JSON.stringify(cityInfo) !== "{}") {
-        this.addLogMsg("Found city...saving");
-        this.testData.city = `${cityInfo.city}, ${cityInfo.state}`;
-      } else {
-        this.addLogMsg("Could not find city, state in Mapquest");
-      }
+      this.testData.locationPrecision = "approximate";
     }
   }
 
   async prepare() {
     this.addLogMsg("START");
     this.addLogMsg("BEGIN Speedtest preparation");
-    await this.getIPAndApproxLocation();
-    await this.checkDBForPrevTest();
-    await this.getPreciseLocation();
     this.testData.date = this.today.toISOString().split("T")[0];
     this.testData.time = this.today.toISOString().split("T")[1].slice(0, -1);
     this.testData.localDateTimeString = this.today.toString();
     this.testData.userID = this.userID;
-    // CONFIG SPEED TEST
-    this.speedTest.setParameter("garbagePhp_chunkSize", this.chunkSize);
-    this.speedTest.setParameter("test_order", this.testOrder);
-    this.speedTest.setSelectedServer(RuralTest.SPEEDTEST_SERVERS[0]);
-    // Each time we get new data from a running speed test, update the svelte store
-    // And the class attributes
-    this.speedTest.onupdate = (data) => {
-      this.testData["downloadSpeed"] = Math.round(data.dlStatus * 10) / 10;
-      this.testData["uploadSpeed"] = Math.round(data.ulStatus * 10) / 10;
-      this.testData["ping"] = Math.round(data.pingStatus * 10) / 10;
-      this.testData["state"] = RuralTest.testStates[data.testState + 1];
-      this.testData["isPrevTest"] = false;
+    let success = await this.getIPAndApproxLocation();
+    if (success) {
+      success = await this.checkDBForPrevTest();
+    }
+    if (success) {
+      await this.getPreciseLocation();
+      // CONFIG SPEED TEST
+      this.speedTest.setParameter("garbagePhp_chunkSize", this.chunkSize);
+      this.speedTest.setParameter("test_order", this.testOrder);
+      this.speedTest.setSelectedServer(RuralTest.SPEEDTEST_SERVERS[0]);
+      // Each time we get new data from a running speed test, update the svelte store
+      // And the class attributes
+      this.speedTest.onupdate = (data) => {
+        this.testData["downloadSpeed"] = Math.round(data.dlStatus * 10) / 10;
+        this.testData["uploadSpeed"] = Math.round(data.ulStatus * 10) / 10;
+        this.testData["ping"] = Math.round(data.pingStatus * 10) / 10;
+        this.testData["state"] = RuralTest.testStates[data.testState + 1];
+        this.testData["isPrevTest"] = false;
 
-      currentTest.set(this.testData);
-    };
-    // When the speedtest ends call our own onEnd() method
-    this.speedTest.onend = async (data) => {
-      await this.onEnd(data);
-    };
-
-    this.prepared = true;
-    this.addLogMsg("END Speedtest preparation");
+        currentTest.set(this.testData);
+      };
+      // When the speedtest ends call our own onEnd() method
+      this.speedTest.onend = async (data) => {
+        await this.onEnd(data);
+      };
+      this.prepared = true;
+      this.addLogMsg("END Speedtest preparation");
+    }
   }
 
   async startTest() {
     if (!this.prepared) {
       await this.prepare();
+      if (!this.prepared) {
+        this.testData.error = true;
+        console.error(this.testData.errorText);
+        console.error("FAILED Speedtest preparation...aborting");
+        currentTest.set(this.testData);
+      } else {
+        this.addLogMsg("BEGIN Test");
+        this.inProgress = true;
+        this.speedTest.start();
+      }
     }
-    this.addLogMsg("BEGIN Test");
-    this.inProgress = true;
-    this.speedTest.start();
   }
 
   abortTest() {
@@ -260,16 +288,19 @@ export class RuralTest {
   async onEnd(aborted) {
     this.addLogMsg("END Test");
     this.finished = true;
+    let testResults = new RuralTestResult(this.testData);
+    // Always store local test results
+    this.addLogMsg("Saving result locally to browser...");
+    testResults.storeTestLocal();
     if (this.upload) {
       if (!aborted) {
-        this.addLogMsg("Saving result...");
-        let testResults = new RuralTestResult(this.testData);
+        this.addLogMsg("Saving result to db...");
         await testResults.postTest();
       } else {
         this.addLogMsg("test aborted");
       }
     } else {
-      this.addLogMsg("Skipping save result...");
+      this.addLogMsg("Skipping save result to db...");
     }
     this.addLogMsg("DONE!");
   }
@@ -329,8 +360,11 @@ export class RuralTestResult {
     }
   }
   storeTestLocal() {
-    window.localStorage.setItem("recentTest", JSON.stringify(this._content));
-    window.localStorage.setItem("recentTestDate", Date.now());
+    window.localStorage.setItem(
+      "ruralnet-recentTest",
+      JSON.stringify(this._content)
+    );
+    window.localStorage.setItem("ruralnet-recentTestDate", Date.now());
   }
   async postTest(update = false) {
     this.logMsg("Uploading to db...");
@@ -364,11 +398,11 @@ export class RuralTestResult {
     return this._saveResults;
   }
   static retrieveTestLocal() {
-    let lastTest = window.localStorage.getItem("recentTest");
+    let lastTest = window.localStorage.getItem("ruralnet-recentTest");
     let testJson = null;
     if (lastTest) {
       let lastTestTime = parseInt(
-        window.localStorage.getItem("recentTestDate")
+        window.localStorage.getItem("ruralnet-recentTestDate")
       );
       if (
         Date.now() <

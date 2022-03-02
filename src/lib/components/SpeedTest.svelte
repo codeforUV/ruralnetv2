@@ -25,27 +25,39 @@
   let showSurveyButton = false;
   let showLastTestDate = false;
   let buttonText = "Start";
-  let loading = true;
+  let loading = false;
   $: dateTime = new Date(`${$currentTest.date}T${$currentTest.time}Z`);
   $: dateText = `Last test taken on ${dateTime.toLocaleDateString()} at ${dateTime.toLocaleTimeString()}`;
+  $: locationConsentText =
+    headerText === "Take a new test"
+      ? "Please accept permission to get your location when prompted"
+      : "";
 
   // Watches the $currentTest sveltestore and auto-updates the javascript variables in
   // real-time
   $: {
-    if ($currentTest.isPrevTest) {
+    if (!$currentTest.error) {
+      if ($currentTest.isPrevTest) {
+        loading = false;
+        showStartButton = true;
+        showSurveyButton = false;
+        showLastTestDate = true;
+        headerText = "Welcome Back!";
+        buttonText = "Take another test";
+      } else if ($currentTest.state === "not started") {
+        headerText = "Take a new test";
+      } else if ($currentTest.state === "finished") {
+        headerText = "Complete";
+        loading = false;
+        showSurveyButton = true;
+        showLastTestDate = true;
+      }
+    } else {
       loading = false;
-      showStartButton = true;
+      showLastTestDate = false;
+      showStartButton = false;
       showSurveyButton = false;
-      showLastTestDate = true;
-      headerText = "Welcome Back!";
-      buttonText = "Take another test";
-    } else if ($currentTest.state === "not started") {
-      headerText = "Take a new test";
-    } else if ($currentTest.state === "finished") {
-      headerText = "Complete";
-      loading = false;
-      showSurveyButton = true;
-      showLastTestDate = true;
+      headerText = "Oops, there was an error";
     }
   }
 
@@ -83,10 +95,11 @@ rounded-3xl"
 >
   <!-- Header text row  -->
   <div class="col-span-3 row-span-3 row-start-1">
-    <h1 class="text-4xl py-4">{headerText}</h1>
+    <h1 class="text-4xl py-2">{headerText}</h1>
+    <p class="text-sm text-gray-500 italic">{locationConsentText}</p>
   </div>
 
-  <!-- Loading spinner, start button, or survey button row -->
+  <!-- Loading spinner, start button, survey button, or error row -->
   {#if loading}
     <div
       class="col-span-1 col-start-2 row-start-4 row-span-3 flex items-center justify-center"
@@ -110,6 +123,21 @@ rounded-3xl"
       >
     </div>
   {/if}
+  {#if $currentTest.error}
+    <div class="col-span-3 row-start-4 row-span-3">
+      <p class="text-black text-lg">
+        Please contact <a
+          href="mailto:ruralnet@codeforuv.org"
+          class="underline
+        text-blue-500 cursor-pointer hover:text-blue-700"
+          >ruralnet@codeforuv.org</a
+        > with the following error message:
+      </p>
+    </div>
+    <div class="col-span-3 row-start-7 row-span-3">
+      <p class="text-red-600">{$currentTest.errorText}</p>
+    </div>
+  {/if}
 
   <!-- Last test date row -->
   {#if showLastTestDate}
@@ -119,47 +147,54 @@ rounded-3xl"
   {/if}
 
   <!-- Metrics row -->
-  {#if $currentTest.ping}
-    <div class="col-span-1 flex flex-col my-auto row-start-[8] row-span-3">
-      <p class="text-3xl">
-        {$currentTest.ping} <span class="text-2xl">ms</span>
-      </p>
-      <p class="text-gray-500">Ping</p>
-    </div>
-  {/if}
-  {#if $currentTest.downloadSpeed}
-    <div class="col-span-1 flex flex-col my-auto row-start-[8] row-span-3">
-      <p class="text-3xl">
-        {$currentTest.downloadSpeed} <span class="text-2xl">mb/s</span>
-      </p>
-      <p class="text-gray-500">Download</p>
-    </div>
-  {/if}
-  {#if $currentTest.uploadSpeed}
-    <div class="col-span-1 flex flex-col my-auto row-start-[8] row-span-3">
-      <p class="text-3xl">
-        {$currentTest.uploadSpeed} <span class="text-2xl">mb/s</span>
-      </p>
-      <p class="text-gray-500">Upload</p>
-    </div>
-  {/if}
+  {#if !$currentTest.error}
+    {#if $currentTest.ping}
+      <div class="col-span-1 flex flex-col my-auto row-start-[8] row-span-3">
+        <p class="text-3xl">
+          {$currentTest.ping} <span class="text-2xl">ms</span>
+        </p>
+        <p class="text-gray-500">Ping</p>
+      </div>
+    {/if}
+    {#if $currentTest.downloadSpeed}
+      <div class="col-span-1 flex flex-col my-auto row-start-[8] row-span-3">
+        <p class="text-3xl">
+          {$currentTest.downloadSpeed} <span class="text-2xl">mb/s</span>
+        </p>
+        <p class="text-gray-500">Download</p>
+      </div>
+    {/if}
+    {#if $currentTest.uploadSpeed}
+      <div class="col-span-1 flex flex-col my-auto row-start-[8] row-span-3">
+        <p class="text-3xl">
+          {$currentTest.uploadSpeed} <span class="text-2xl">mb/s</span>
+        </p>
+        <p class="text-gray-500">Upload</p>
+      </div>
+    {/if}
 
-  <!-- Location row -->
-  {#if $currentTest.city}
-    <div
-      class="row-start-[11] row-span-1 col-start-2 text-center text-lg text-gray-500 italic "
-    >
-      <p>{$currentTest.city}</p>
-    </div>
-  {/if}
+    <!-- Location row -->
+    {#if $currentTest.city}
+      <div
+        class="row-start-[11] row-span-1 col-start-2 text-center text-lg text-gray-500 italic "
+      >
+        <p>{$currentTest.city}</p>
+        {#if $currentTest.locationPrecision}
+          <p class="text-sm">
+            (Location accuracy: {$currentTest.locationPrecision})
+          </p>
+        {/if}
+      </div>
+    {/if}
 
-  <!-- Link to results map row -->
-  {#if !loading}
-    <div
-      class="row-start-[12] row-span-1 col-start-2 text-center text-sm text-blue-500
-  underline pt-4"
-    >
-      <a href="/results">Go to Results Map →</a>
-    </div>
+    <!-- Link to results map row -->
+    {#if !loading}
+      <div
+        class="row-start-[12] row-span-1 col-start-2 text-center text-sm text-blue-500
+  underline pt-5"
+      >
+        <a href="/results">Go to Results Map →</a>
+      </div>
+    {/if}
   {/if}
 </div>
