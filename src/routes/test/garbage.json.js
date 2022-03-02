@@ -5,6 +5,8 @@
 // responses from the same end-point (e.g. res.write() in express) instead just follow
 // the directions for librespeedtest and return a single 100mb file as suggested here:
 // https://github.com/librespeed/speedtest/wiki/Alternative-backends
+// If we decide we need a custom-backed specifically for all the routes in test/ see the
+// guidelines in the sveltekit node-apapter docs: https://github.com/sveltejs/kit/tree/master/packages/adapter-node
 import randomBytes from "random-bytes";
 
 export async function get({ request }) {
@@ -16,17 +18,17 @@ export async function get({ request }) {
   // suggested in this sveltekit issue: https://github.com/sveltejs/kit/issues/1563
   // In theory we could just do body: await sendBytes(), however this doesn't yet work
   // and will produce a server error
-  async function* sendBytes() {
-    if (!cache) {
-      b = await randomBytes(1048576);
-      cache = b;
-    } else {
-      b = cache;
-    }
-    for (let i = 0; i < requestedSize; i++) {
-      yield b;
-    }
-  }
+  // async function* sendBytes() {
+  //   if (!cache) {
+  //     b = await randomBytes(1048576);
+  //     cache = b;
+  //   } else {
+  //     b = cache;
+  //   }
+  //   for (let i = 0; i < requestedSize; i++) {
+  //     yield b;
+  //   }
+  // }
 
   return {
     status: 200,
