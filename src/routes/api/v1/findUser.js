@@ -35,7 +35,6 @@ export async function get({ request, url }) {
       };
     }
   } else {
-    console.log(request.headers);
     return {
       status: 404,
       body: "ip_address query param and cookie missing",

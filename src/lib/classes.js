@@ -76,14 +76,15 @@ export class RuralTest {
     "aborted",
   ];
 
+  // See more options and explanations here: https://github.com/librespeed/speedtest/wiki/Making-a-custom-front-end
   static SPEEDTEST_SERVERS = [
     {
       name: "RuralNet Server",
-      server: "/test/", //"https://192.168.1.13:3000/",  // /test/ will point to where the speed test backend routes are located in /src
-      dlURL: "garbage.json",
-      ulURL: "empty.json", // "empty.bin", // in speedtest docs, an empty file (like empty.bin) can be a suitable replacement for a real backend - perhaps this gets around heroku h18 503 error "empty.json",
+      server: "/test/", // our backend route to run the test
+      dlURL: "garbage.json", // generates 100mb of garbage data for testing
+      ulURL: "empty.json", // sends an empty response with specific headers
       pingURL: "empty.json",
-      getIpURL: "getIP.json",
+      getIpURL: "getIP.json", // unused so doesn't exist
     },
   ];
 
@@ -110,7 +111,7 @@ export class RuralTest {
     this.finished = false;
     this._state = 0;
     this.chunkSize = 100;
-    this.testOrder = "IPDU"; //order in which tests will be performed as a string. D=Download, U=Upload, P=Ping+Jitter, I=IP, _=1 second delay
+    this.testOrder = "PDU"; // order in which tests will be performed as a string. D=Download, U=Upload, P=Ping+Jitter, I=IP, _=1 second delay. Skip IP since we do it using the abstract API
     this.testData = RuralTest.emptyTestJson;
     this.logging = logging;
     this.upload = upload;
@@ -142,6 +143,11 @@ export class RuralTest {
   }
 
   async getIPAndApproxLocation() {
+    // NOTE: We actually have access to the request headers when the app is deployed
+    // live using the node-adapter on Heroku. It's available in
+    // request.headers['x-forwarded-for']. However, during the local dev server doesn't
+    // return this info in the response header, so this is a workaround to hit the
+    // abstract API which also gives us some approximate location info
     this.addLogMsg(
       "Getting user IP and approximate location from Abstract API"
     );
@@ -244,6 +250,8 @@ export class RuralTest {
       // CONFIG SPEED TEST
       this.speedTest.setParameter("garbagePhp_chunkSize", this.chunkSize);
       this.speedTest.setParameter("test_order", this.testOrder);
+      this.speedTest.setParameter("getIp_ispInfo", false);
+      this.speedTest.setParameter("getIp_ispInfo_distance", false);
       this.speedTest.setSelectedServer(RuralTest.SPEEDTEST_SERVERS[0]);
       // Each time we get new data from a running speed test, update the svelte store
       // And the class attributes

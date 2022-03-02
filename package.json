@@ -18,10 +18,10 @@
     "@sveltejs/kit": "next",
     "autoprefixer": "^10.4.2",
     "postcss": "^8.4.5",
-    "svelte": "^3.46.0",
-    "tailwindcss": "^3.0.12",
     "postcss-load-config": "^3.1.1",
-    "svelte-preprocess": "^4.10.1"
+    "svelte": "^3.46.0",
+    "svelte-preprocess": "^4.10.1",
+    "tailwindcss": "^3.0.12"
   },
   "type": "module",
   "dependencies": {
@@ -30,6 +30,7 @@
     "cookie": "^0.4.1",
     "dotenv": "^16.0.0",
     "leaflet": "^1.7.1",
-    "mongoose": "^6.2.0"
+    "mongoose": "^6.2.0",
+    "random-bytes": "^1.0.0"
   }
 }
