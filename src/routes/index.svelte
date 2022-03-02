@@ -1,8 +1,5 @@
-<script context="module">
-  export const prerender = true;
-</script>
-
 <script>
+  import SpeedTest from "$lib/components/SpeedTest.svelte";
 </script>
 
 <style>
@@ -13,5 +10,10 @@
 </svelte:head>
 
 <div
-  class="bg-[url(/images/vt_trees_mtns.jpg)] bg-cover bg-no-repeat bg-center min-h-screen"
-/>
+  class="bg-[url(/images/vt_trees_mtns.jpg)] bg-cover bg-no-repeat bg-center min-h-screen
+flex"
+>
+  <div class="m-auto w-1/2">
+    <SpeedTest />
+  </div>
+</div>
