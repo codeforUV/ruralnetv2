@@ -13,7 +13,7 @@
   // Run speed test with console logging when in development
   let logging = import.meta.env.DEV;
   // Enable data upload by default
-  let upload = false;
+  let upload = true;
   const dispatch = createEventDispatcher();
 
   // Initialize a new instance of the class that handles speed tests

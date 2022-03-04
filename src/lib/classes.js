@@ -380,7 +380,7 @@ export class RuralTestResult {
   async postTest(update = false) {
     this.logMsg("Uploading to db...");
     try {
-      const res = await fetch("/api/v1/saveTest", {
+      const res = await fetch("/api/v1/db", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

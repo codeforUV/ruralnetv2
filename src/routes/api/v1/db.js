@@ -27,27 +27,20 @@ const verifyAuth = (request) => {
 
 // get all speedtests
 export async function get({ request, url, params, locals }) {
-  if (verifyAuth(request)) {
-    try {
-      if (import.meta.env.DEV) {
-        console.log("Returning all docs");
-      }
-      const docs = await SpeedTest.find({}).exec();
-      return {
-        status: 200,
-        body: { docs },
-      };
-    } catch (err) {
-      console.log(err.stack);
-      return {
-        status: 500,
-        resp: JSON.stringify({ resp: err.stack }),
-      };
+  try {
+    if (import.meta.env.DEV) {
+      console.log("Returning all docs");
     }
-  } else {
+    const docs = await SpeedTest.find({}).exec();
     return {
-      status: 403,
-      body: "This is not a public API",
+      status: 200,
+      body: { docs },
+    };
+  } catch (err) {
+    console.log(err.stack);
+    return {
+      status: 500,
+      resp: JSON.stringify({ resp: err.stack }),
     };
   }
 }
@@ -81,54 +74,47 @@ export async function del({ request, url, params, locals }) {
 }
 
 export async function post({ request, url, params, locals }) {
-  if (verifyAuth(request)) {
-    const data = await request.json();
-    try {
-      let newTest, saved;
-      // if _id is included, then this test is being updated
-      if (data._id) {
-        if (import.meta.env.DEV) {
-          console.log("Updating existing document");
-        }
-        await SpeedTest.updateOne({ _id: data._id }, { $set: data }).exec();
-        newTest = { _id: data._id };
-        saved = newTest;
-        // newTest and saved will both be undefined
-        // if _id is not included, then it is a fresh new test. _id is automatically assigned by Mongo.
-      } else {
-        if (import.meta.env.DEV) {
-          console.log("Saving new document");
-        }
-        newTest = new SpeedTest(data);
-        saved = await newTest.save();
+  const data = await request.json();
+  try {
+    let newTest, saved;
+    // if _id is included, then this test is being updated
+    if (data._id) {
+      if (import.meta.env.DEV) {
+        console.log("Updating existing document");
       }
-      if (saved === newTest) {
-        return {
-          status: 200,
-          body: JSON.stringify({
-            resp: "Data saved successfully",
-            entryId: newTest._id,
-          }),
-        };
-      } else {
-        return {
-          status: 500,
-          resp: JSON.stringify({
-            resp: "Probelm saving data",
-          }),
-        };
+      await SpeedTest.updateOne({ _id: data._id }, { $set: data }).exec();
+      newTest = { _id: data._id };
+      saved = newTest;
+      // newTest and saved will both be undefined
+      // if _id is not included, then it is a fresh new test. _id is automatically assigned by Mongo.
+    } else {
+      if (import.meta.env.DEV) {
+        console.log("Saving new document");
       }
-    } catch (err) {
-      console.log(err.stack);
+      newTest = new SpeedTest(data);
+      saved = await newTest.save();
+    }
+    if (saved === newTest) {
+      return {
+        status: 200,
+        body: JSON.stringify({
+          resp: "Data saved successfully",
+          entryId: newTest._id,
+        }),
+      };
+    } else {
       return {
         status: 500,
-        resp: JSON.stringify({ resp: err.stack }),
+        resp: JSON.stringify({
+          resp: "Probelm saving data",
+        }),
       };
     }
-  } else {
+  } catch (err) {
+    console.log(err.stack);
     return {
-      status: 403,
-      body: "This is not a public API",
+      status: 500,
+      resp: JSON.stringify({ resp: err.stack }),
     };
   }
 }

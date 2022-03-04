@@ -1,5 +1,4 @@
 // Public API that saves a test result
-import { makeAuthenticatedReq } from "$lib/helpers";
 
 export async function get({ request }) {
   return {
@@ -9,7 +8,6 @@ export async function get({ request }) {
 }
 
 export async function post(request) {
-  const resp = await makeAuthenticatedReq(request, "POST");
   if (resp.ok) {
     return {
       status: resp.status,
