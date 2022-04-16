@@ -8,6 +8,7 @@
   import { session } from "$app/stores";
   import { currentTest } from "$lib/stores";
 
+  import Survey  from "./Survey.svelte"
   import LoadingSpinner from "./LoadingSpinner.svelte";
 
   // Run speed test with console logging when in development
@@ -24,6 +25,7 @@
   let showStartButton = true;
   let showSurveyButton = false;
   let showLastTestDate = false;
+  let showSurvey = false;
   let buttonText = "Start";
   let loading = false;
   $: dateTime = new Date(`${$currentTest.date}T${$currentTest.time}Z`);
@@ -81,6 +83,8 @@
   // TODO: write me
   const startSurvey = () => {
     console.log("Show survey");
+    showSurvey = true;
+    showStartButton = false;
   };
 
   // TODO: write or delete me
@@ -89,6 +93,13 @@
   };
 </script>
 
+{#if showSurvey}
+      <div
+      class="col-span-1 col-start-2 row-start-4 row-span-3 flex items-center justify-center"
+    >
+      <Survey />
+    </div>
+{:else}
 <div
   class="grid grid-rows-[repeat(12,_minmax(0,_1fr))] grid-cols-3 bg-white bg-opacity-80 p-4 w-full h-96 text-center
 rounded-3xl"
@@ -98,6 +109,8 @@ rounded-3xl"
     <h1 class="text-4xl py-2">{headerText}</h1>
     <p class="text-sm text-gray-500 italic">{locationConsentText}</p>
   </div>
+
+  
 
   <!-- Loading spinner, start button, survey button, or error row -->
   {#if loading}
@@ -198,3 +211,4 @@ rounded-3xl"
     {/if}
   {/if}
 </div>
+{/if}

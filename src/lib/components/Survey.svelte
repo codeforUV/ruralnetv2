@@ -206,6 +206,14 @@
 <div class='bg-white bg-opacity-80 
             p-4 w-full h-fit
             rounded-3xl'>
+    {#if submitted === true}
+
+        <div class="w-full text-center py-10">
+            <div>Thank you for your submission!</div>
+            <a class="text-blue-600" href="results">Go to Results Page</a>
+        </div>
+
+    {:else}
 
     <p class='w-full text-left'>{questionNumber + 1} of {surveyInfo.length}</p>
 
@@ -285,28 +293,26 @@
             <div>Error: Input for this survey question has not been accounted for. (index:{questionNumber} of surveyInfo.  Component: Survey.svelte)</div>
         {/if}
         </div>
-        {#if submitted === false}
-            {#if message}
-                <div class="text-red-500 w-full flex justify-center">{message}</div>
-            {/if}
-            <div class="my-5 w-full flex justify-center">
-                {#if questionNumber !== 0}
-                    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 mx-2 rounded" on:click={prevQuestion}>←</button>
-                {/if}
-                {#if questionNumber !== (surveyInfo.length - 1)}
-                    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 mx-2 rounded" on:click={nextQuestion}>→</button>
-                {/if}
-            </div>
-            
-            {#if allQuestionsAnswered}
-            <div class="w-full flex justify-center">
-                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" on:click={finishSurvey} >Submit</button>
-            </div>
-            {/if}
+        </div>
 
-        {:else}
-            <div>Thank you for your submission!</div>
-            <a href="results">Go to Results Page</a>
+        {#if message}
+            <div class="text-red-500 w-full flex justify-center">{message}</div>
         {/if}
-    </div>
+        <div class="my-5 w-full flex justify-center">
+            {#if questionNumber !== 0}
+                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 mx-2 rounded" on:click={prevQuestion}>←</button>
+            {/if}
+            {#if questionNumber !== (surveyInfo.length - 1)}
+                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 mx-2 rounded" on:click={nextQuestion}>→</button>
+            {/if}
+        </div>
+        
+        {#if allQuestionsAnswered}
+        <div class="w-full flex justify-center">
+            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" on:click={finishSurvey} >Submit</button>
+        </div>
+        {/if}
+
+    {/if}
 </div>
+    

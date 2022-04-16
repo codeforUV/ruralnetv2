@@ -16,10 +16,21 @@ The return object should be a standard HTTP response object including at least {
 // Public API that saves a test result
 
 export async function get({ request }) {
-    return {
-        status: 200,
-        body: "This route is used for saving survey data",
-    };
+
+    const surveys = await SurveySubmissions.find({}).exec();
+
+    if (surveys) {
+        return {
+            status: 201,
+            body: { surveys }
+        }
+    } else {
+        return {
+            status: 404,
+            body: "No surveys found",
+        };
+    }
+
 }
 
 export async function post({ request, url, params, locals, platform }) {
