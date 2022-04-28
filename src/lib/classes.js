@@ -218,6 +218,10 @@ export class RuralTest {
     return this.testData;
   }
 
+  async ready() {
+    this.prepared = true;
+  }
+
   async startTest() {
     if (!this.prepared) {
       this.testData.error = true;
