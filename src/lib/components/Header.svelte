@@ -28,18 +28,10 @@
           About
         </a>
       {/if}
-      {#if $page.url.pathname !== "/news"}
-        <a
-          href="news"
-          class="block mt-4 sm:inline-block sm:mt-0 text-teal-200 hover:text-white"
-        >
-          News
-        </a>
-      {/if}
     </div>
     <div>
       <a
-        href="#"
+        href="/"
         class="inline-block text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-blue-500 hover:bg-white mt-4 md:mt-0"
         >Test Your Speed</a
       >
