@@ -1,42 +1,40 @@
-<!-- TODO: Replace this page with the actual results map. This was just to make sure the
-databast connection was working-->
-<script>
-  // This is the what we get returned to us fom get() inside of routes/results/index.js
-  // Setting a default value of [] in case we don't get anything back so the #each loop
-  // below doesn't crash
-  export let docs = [];
+<!-- We don't need an endpoint here is just load the data from the API server-side -->
+<script context="module">
+  // Make an authenticated request to the /api/db route and just send the sanitized data
+  // back the client, rather than giving the client direct read access to the entire db
+  export async function load({ fetch }) {
+    const resp = await fetch("/api/v1/db");
+    const { docs } = await resp.json();
+    // Only send the info we need to generate the map to the client rather than
+    // ip_address and potentially other identifiable info
+    const data = [];
+    docs.forEach(
+      ({ latitude, longitude, downloadSpeed, uploadSpeed, ping, city }) => {
+        data.push({
+          latitude,
+          longitude,
+          downloadSpeed,
+          uploadSpeed,
+          ping,
+          city,
+        });
+      }
+    );
+    return {
+      status: resp.status,
+      props: { data },
+    };
+  }
 </script>
 
-<div class="p-8">
-  <h1 class="text-4xl mb-6">Test Results</h1>
-  <ol class="list-decimal pl-6">
-    {#each docs as { _id, downloadSpeed, uploadSpeed, ping, city, internetProvider, date }, i}
-      <li>
-        <p>
-          <strong>Speed: </strong>
-          {downloadSpeed}/{uploadSpeed} Mbps
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="icon icon-tabler icon-tabler-square-x"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="#607D8B"
-            fill="none"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-            <rect x="4" y="4" width="16" height="16" rx="2" />
-            <path d="M10 10l4 4m0 -4l-4 4" />
-          </svg>
-        </p>
-        <p class="font-bold">Ping: {ping}ms</p>
-        <p class="italic">
-          {internetProvider}, {city || "location unknown"}, {date}
-        </p>
-      </li>
-    {/each}
-  </ol>
+<script>
+  import ApiMap from "$lib/components/APIMap.svelte";
+
+  export let data = [];
+</script>
+
+<h1 class="text-4xl pt-8 pl-8 mb-6">Test Results</h1>
+
+<div class="p-4 w-screen h-[80vh]">
+  <ApiMap {data} />
 </div>

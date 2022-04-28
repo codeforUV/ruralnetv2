@@ -1,4 +1,4 @@
-import cookie from "cookie";
+import { parse, serialize } from "cookie";
 import { v4 as uuid } from "@lukeed/uuid";
 import { dev } from "$app/env";
 import mongoose from "mongoose";
@@ -27,26 +27,28 @@ export const handle = async ({ event, resolve }) => {
     });
   }
 
-  // This cookie checking and setting functionality came with the sveltekit template.
-  // Leaving it here so we can adjust how we were doing cookies before to make them work
-  // with sveltekit. See:
-  // https://blog.logrocket.com/authentication-sveltekit-using-cookies/ for an example
-  const cookies = cookie.parse(event.request.headers.get("cookie") || "");
+  const userAgent = event.request.headers["user-agent"];
+  const cookies = parse(event.request.headers.get("cookie") || "");
   event.locals.userid = cookies.userid || uuid();
-
   const response = await resolve(event);
 
-  if (!cookies.userid) {
-    // if this is the first time the user has visited this app,
-    // set a cookie so that we recognise them when they return
-    response.headers.set(
-      "set-cookie",
-      cookie.serialize("userid", event.locals.userid, {
-        path: "/",
-        httpOnly: true,
-      })
-    );
+  if (userAgent !== "node-fetch") {
+    if (!cookies.userid) {
+      response.headers.set(
+        "set-cookie",
+        serialize("userid", event.locals.userid, {
+          path: "/",
+          httpOnly: true,
+        })
+      );
+    }
+  } else {
+    console.log("Internal request...skipping cookie assignment");
   }
-
   return response;
+};
+
+// Make their user is available in the client-side sveltestore $session
+export const getSession = (request) => {
+  return request.locals;
 };
