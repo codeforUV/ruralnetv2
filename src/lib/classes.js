@@ -207,9 +207,14 @@ export class RuralTest {
       this.speedTest.onend = async (data) => {
         await this.onEnd(data);
       };
-      this.prepared = true;
+      // End by moving to the custom verify location state
+      this.testData["state"] = "verify location";
       this.addLogMsg("END Speedtest preparation");
     }
+  }
+
+  async ready() {
+    this.prepared = true;
   }
 
   async startTest() {
