@@ -10,7 +10,7 @@
   }
 </style>
 
-<footer class="fixed bottom-0 w-full bg-gray-600 text-white py-4">
+<footer class=" w-full bg-gray-800 text-white py-4">
   <ul class="flex justify-around">
     {#if $page.url.pathname !== "/"}
       <li><a href="/">RuralNet</a></li>
