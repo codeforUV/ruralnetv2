@@ -3,6 +3,9 @@
  * e.g. will only work in .json.js routes, not svelte routes
  */
 
+ import { parse, serialize } from "cookie";
+
+
 // Make an authenticated request against the /api/db endpoint by setting the value of
 // the request header based on the BACKEND_AUTH key known only to the server
 export const makeAuthenticatedReq = async (req, method) => {
@@ -28,3 +31,29 @@ export const makeAuthenticatedReq = async (req, method) => {
   }
   return fetch(url, options);
 };
+
+const cookies = () => {
+
+
+  const setCookieStatus = (status) => {
+
+    if (status === true || status === false) {
+      document.cookie = `_rn_cookie_status=${status}`
+    } else {
+      console.error("Invalid value for cookie status. Must be 'true' or 'false'.")
+    }
+
+  }
+
+  const getCookieStatus = () => {
+    let cookies = parse(document.cookie)
+    return cookies._rn_cookie_status
+  }
+
+  return {
+    setCookieStatus: setCookieStatus,
+    getCookieStatus: getCookieStatus,
+  }
+}
+
+export const useCookies = cookies()
