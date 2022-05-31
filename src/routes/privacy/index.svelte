@@ -13,8 +13,9 @@ import CookiesSetting from "$lib/components/CookiesSetting.svelte"
 </style>
 
 <div class="p-8">
+  <h1 class='text-4xl mb-6'>Privacy Settings</h1>
   <CookiesSetting/>
-  <h1 class="text-4xl mb-6">Privacy Policy</h1>
+  <h2 class="text-3xl mb-6">Privacy Policy</h2>
   <p>
     RuralNet ("The Website"), a project of Code for Upper Valley ("We", "Us"), respects your privacy and believes that you deserve to know what we do with your data.
   </p>

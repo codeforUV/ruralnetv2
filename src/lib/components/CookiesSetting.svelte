@@ -22,7 +22,7 @@
 
 <style>
     .btn {
-        @apply rounded py-2 px-5;
+        @apply rounded py-2 px-5 m-2;
     }
     .accept {
         @apply bg-blue-400;
@@ -33,23 +33,20 @@
 </style>
 
 
-
-<div class='w-[98vw] min-h-[100px]'>
-    <h2>Privacy Settings</h2>
-    <div class='flex'>
-        <div>
-            {#if cookiesAccepted == 'true'}
-                <div>Cookies Status: Accepted</div>
-                <button class='btn decline' on:click={setDecline}>Decline Cookies</button>
-            {:else if cookiesAccepted == 'false'}
-                <div>Cookies Status: Declined</div>
-                <button class='btn accept' on:click={setAccept}>Accept Cookies</button>
-            {:else }
-                <div>Cookies Status: Undecided</div>
-                <button class='btn accept' on:click={setAccept}>Accept Cookies</button>
-                <button class='btn decline' on:click={setDecline}>Decline Cookies</button>
-            {/if}
-        </div>
+<div class='flex'>
+    <div>
+        {#if cookiesAccepted == 'true'}
+            <div>Cookies Status: Accepted</div>
+            <button class='btn decline' on:click={setDecline}>Decline Cookies</button>
+        {:else if cookiesAccepted == 'false'}
+            <div>Cookies Status: Declined</div>
+            <button class='btn accept' on:click={setAccept}>Accept Cookies</button>
+        {:else }
+            <div>Cookies Status: Undecided</div>
+            <button class='btn accept' on:click={setAccept}>Accept Cookies</button>
+            <button class='btn decline' on:click={setDecline}>Decline Cookies</button>
+        {/if}
     </div>
 </div>
+
   
