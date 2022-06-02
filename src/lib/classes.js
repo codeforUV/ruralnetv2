@@ -209,27 +209,25 @@ export class RuralTest {
       };
       // End by moving to the custom verify location state
       this.testData["state"] = "verify location";
+      currentTest.set(this.testData);
+      this.prepared = true;
       this.addLogMsg("END Speedtest preparation");
     }
   }
-
-  async ready() {
-    this.prepared = true;
+  async verifyLocation() {
+    return this.testData;
   }
 
   async startTest() {
     if (!this.prepared) {
-      await this.prepare();
-      if (!this.prepared) {
-        this.testData.error = true;
-        console.error(this.testData.errorText);
-        console.error("FAILED Speedtest preparation...aborting");
-        currentTest.set(this.testData);
-      } else {
-        this.addLogMsg("BEGIN Test");
-        this.inProgress = true;
-        this.speedTest.start();
-      }
+      this.testData.error = true;
+      console.error(this.testData.errorText);
+      console.error("FAILED Speedtest preparation...aborting");
+      currentTest.set(this.testData);
+    } else {
+      this.addLogMsg("BEGIN Test");
+      this.inProgress = true;
+      this.speedTest.start();
     }
   }
 

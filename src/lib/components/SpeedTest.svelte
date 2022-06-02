@@ -77,10 +77,15 @@
     showStartButton = false;
     showLastTestDate = false;
 
+    // Prepare does the following "waterfall" of operations in addition to setting up a
+    // speed test:
+    // .getIPAndApproxLocation()
+    // .checkDBForPrevTest()
+    // .getPreciseLocation()
     await speedTest.prepare();
-    headerText = "Verify Location";
+    headerText = "Please verify your location";
     showLocationVerify = true;
-    await speedTest.verifyLocation();
+    const data = await speedTest.verifyLocation();
   };
 
   const startTest = async () => {
@@ -89,7 +94,7 @@
     showStartButton = false;
     showLastTestDate = false;
     headerText = "In Progress";
-    speedTest.startTest();
+    await speedTest.startTest();
   };
 
   // TODO: write me
@@ -123,7 +128,7 @@ rounded-3xl"
     </div>
 
     {#if showLocationVerify}
-      <div class="col-span-3 row-span-[9] row-start-3">
+      <div class="col-span-3 row-start-4 row-span-3">
         <LocationVerify on:verified={startTest} />
       </div>
     {:else}

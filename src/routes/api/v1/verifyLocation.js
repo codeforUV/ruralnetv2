@@ -11,14 +11,19 @@ export async function get({ request, url, params, locals }) {
     const mapquest = `http://www.mapquestapi.com/geocoding/v1/address?key=${key}&maxResults=1&location=${location}`;
     let apiReq = await fetch(mapquest);
     let locationinfo = await apiReq.json();
+    console.log(JSON.stringify(locationinfo));
+    // Split user input to city, state to compare to resp
+    const userInputCity = location.split(",")[0].trim().toLowerCase();
+    const userInputState = location.split(",")[1].trim().toLowerCase();
+
+    // Parse mapquest response
     let result = locationinfo.results[0].locations[0];
-    let formattedResult = (result.adminArea5 + "," + result.adminArea3)
-      .toLowerCase()
-      .replace(/\s+/g, ""); //no whitespace and all lowercase for uniformity with input
+    const userResultCity = result.adminArea5.trim().toLowerCase();
+    const userResultState = result.adminArea3.trim().toLowerCase();
     let verified, userInput, city, latlng, checkedAgainst;
     if (
-      location === result.postalCode ||
-      location.toLowerCase() == formattedResult
+      userResultCity === userInputCity &&
+      userResultState === userInputState
     ) {
       // good outcome, the user query matched the search result
       verified = true;
@@ -28,7 +33,7 @@ export async function get({ request, url, params, locals }) {
       // bad result, user entered garbage
       verified = false;
       userInput = location;
-      checkedAgainst = [result.postalCode, formattedResult];
+      checkedAgainst = `${userResultCity},${userResultState}`;
     }
     return {
       body: JSON.stringify({
