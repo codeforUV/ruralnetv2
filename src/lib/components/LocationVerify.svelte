@@ -8,11 +8,8 @@
   const dispatch = createEventDispatcher();
 
   const startTest = () => {
+    // Emit a verified event to SpeedTest.svelte
     dispatch("verified");
-  };
-
-  const showInput = () => {
-    console.log("show input");
   };
 
   // NOTE: We may want to battle-test santizing the input a bit more. This should catch
@@ -37,7 +34,8 @@
       const resp = await fetch(`/api/v1/verifyLocation?location=${location}`);
       const verification = await resp.json();
       if (verification.verified) {
-        dispatch("verified");
+        // Emit an update event to SpeedTest.svelte
+        dispatch("updateLocation", verification);
       } else {
         String.prototype.toProperCase = function () {
           return this.replace(/\w\S*/g, function (txt) {
@@ -52,7 +50,6 @@
           errorText = "Sorry we couldn't find that location";
         }
       }
-      console.log(verification);
     } catch (err) {
       console.error(err);
     }

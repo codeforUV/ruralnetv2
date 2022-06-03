@@ -234,9 +234,6 @@ export class RuralTest {
       this.addLogMsg("END Speedtest preparation");
     }
   }
-  async verifyLocation() {
-    return this.testData;
-  }
 
   async ready() {
     this.prepared = true;

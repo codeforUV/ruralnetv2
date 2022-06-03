@@ -79,13 +79,19 @@
 
     // Prepare does the following "waterfall" of operations in addition to setting up a
     // speed test:
-    // .getIPAndApproxLocation()
-    // .checkDBForPrevTest()
-    // .getPreciseLocation()
+    // .getIPAndApproxLocation
+    // .checkDBForPrevTest
+    // .getPreciseLocation
     await speedTest.prepare();
     headerText = "Please verify your location";
     showLocationVerify = true;
-    const data = await speedTest.verifyLocation();
+  };
+
+  const updateLocation = async (e) => {
+    speedTest.testData.latitude = e.detail.latlng.lat;
+    speedTest.testData.longitude = e.detail.latlng.lng;
+    speedTest.testData.city = e.detail.city;
+    await startTest();
   };
 
   const startTest = async () => {
@@ -97,7 +103,6 @@
     await speedTest.startTest();
   };
 
-  // TODO: write me
   const startSurvey = () => {
     console.log("Show survey");
     showSurvey = true;
@@ -129,7 +134,10 @@ rounded-3xl"
 
     {#if showLocationVerify}
       <div class="col-span-3 row-start-4 row-span-3">
-        <LocationVerify on:verified={startTest} />
+        <LocationVerify
+          on:verified={startTest}
+          on:updateLocation={updateLocation}
+        />
       </div>
     {:else}
       <!-- Loading spinner, start button, survey button, or error row -->
