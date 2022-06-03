@@ -42,6 +42,26 @@ export class RuralTest {
     longitude: null,
   };
 
+  static browserLocation() {
+    let geo = navigator.geolocation;
+    return new Promise((resolve, reject) => {
+      function successCB(position) {
+        resolve(position.coords);
+      }
+      function errorCB(error) {
+        reject("geolocationFailed");
+      }
+      const options = {
+        enableHighAccuracy: true, // removed timeout browsers like Edge are SLOW on geoloaction.
+        maximumAge: 0, // result must be newer than 5 seconds prior to location request
+      };
+      try {
+        geo.getCurrentPosition(successCB, errorCB, options);
+      } catch (error) {
+        reject("geolocationFailed");
+      }
+    });
+  }
   constructor(logging = true, upload = true, userid) {
     this.speedTest = new Speedtest();
     this.today = new Date();
@@ -142,7 +162,7 @@ export class RuralTest {
       this.addLogMsg(
         "Trying browser location API to get more precise location"
       );
-      browserCoords = await LocationUtility.browserLocation();
+      browserCoords = await RuralTest.browserLocation();
       if (browserCoords !== "geolocationFailed") {
         this.addLogMsg(
           "Got browser lat long...looking up city, state in Mapquest"
@@ -207,24 +227,28 @@ export class RuralTest {
       this.speedTest.onend = async (data) => {
         await this.onEnd(data);
       };
+      // End by moving to the custom verify location state
+      this.testData["state"] = "verify location";
+      currentTest.set(this.testData);
       this.prepared = true;
       this.addLogMsg("END Speedtest preparation");
     }
   }
 
+  async ready() {
+    this.prepared = true;
+  }
+
   async startTest() {
     if (!this.prepared) {
-      await this.prepare();
-      if (!this.prepared) {
-        this.testData.error = true;
-        console.error(this.testData.errorText);
-        console.error("FAILED Speedtest preparation...aborting");
-        currentTest.set(this.testData);
-      } else {
-        this.addLogMsg("BEGIN Test");
-        this.inProgress = true;
-        this.speedTest.start();
-      }
+      this.testData.error = true;
+      console.error(this.testData.errorText);
+      console.error("FAILED Speedtest preparation...aborting");
+      currentTest.set(this.testData);
+    } else {
+      this.addLogMsg("BEGIN Test");
+      this.inProgress = true;
+      this.speedTest.start();
     }
   }
 
@@ -379,85 +403,6 @@ export class RuralTestResult {
     return `${this._content.internetProvider}, ${
       this._content.city
     } on ${new Date(`${this._content.date}T${this._content.time}Z`)}`;
-  }
-}
-
-/**
- * LocationUtility provides a wrapper for location-based operations for a given RuralTestResults instance
- */
-export class LocationUtility {
-  constructor(results) {
-    this.results = results; // a SpeedTestResults instance
-  }
-  get location() {
-    console.log("TODO");
-  }
-  set location(userInput) {
-    console.log("TODO");
-  }
-  static browserLocation() {
-    let geo = navigator.geolocation;
-    return new Promise((resolve, reject) => {
-      function successCB(position) {
-        resolve(position.coords);
-      }
-      function errorCB(error) {
-        reject("geolocationFailed");
-      }
-      const options = {
-        enableHighAccuracy: true, // removed timeout browsers like Edge are SLOW on geoloaction.
-        maximumAge: 0, // result must be newer than 5 seconds prior to location request
-      };
-      try {
-        geo.getCurrentPosition(successCB, errorCB, options);
-      } catch (error) {
-        reject("geolocationFailed");
-      }
-    });
-  }
-  // TODO: Whenever we build the component for letting a user update their location
-  // manually, we can recycle some of the logic here. So leaving this class
-  async updateLocation(newLocation) {
-    // given a test ID and newLocation (zip code or city, state)
-    // verify that newLocation is valid
-    // update the test result in the DB w/ lat + long
-    // newLocation can be either a zipcode "12345" or town/state string "Bradford, VT"
-    let goodFormat = false;
-    let zip = parseInt(newLocation);
-    if (zip < 100000 && newLocation.length === 5) {
-      goodFormat = true;
-    } else if (newLocation.split(",").length === 2) {
-      goodFormat = true;
-      newLocation = newLocation.replaceAll(/\s+/g, "").toLowerCase();
-    }
-    if (goodFormat) {
-      let location = await LocationUtility.verifyLocationInput(newLocation);
-      if (location.verified) {
-        this.results.location = location;
-        this.results.postTest(true);
-        return true;
-      } else {
-        return false; // user input a good format but had a typo or invalid zip code
-      }
-    } else {
-      return false; // user did not input a good format
-    }
-  }
-  static async verifyLocationInput(userLocationStr) {
-    // use internal API to verify that the user has entered a valid location
-    // return valid/invalid + coords if valid?
-    // let verifyReq = await fetch(/api/v1/verifyLocation?location=${userLocationStr}`
-    // );
-    // let verification = await verifyReq.json();
-    // if (verification.verified) {
-    //   console.log("Verified!");
-    //   console.log(verification);
-    //   return verification;
-    // } else {
-    //   console.log("Not Verified!");
-    //   console.log(verification);
-    //   return null;
-    // }
   }
 }
 
