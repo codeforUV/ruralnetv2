@@ -13,11 +13,11 @@ const config = {
         },
       },
     }),
-    vite: {
-      define: {
-        "process.env": process.env,
-      },
-    },
+    // vite: {
+    //   define: {
+    //     "process.env": process.env,
+    //   },
+    // },
   },
 
   preprocess: [

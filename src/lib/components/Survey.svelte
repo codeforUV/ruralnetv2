@@ -1,9 +1,9 @@
 <script>
 
+    import { currentTest } from "$lib/stores";
+    import { session } from "$app/stores";
 
     export let submitted = false;
-
-    
 
     // Initialize memory for variables
     let questionNumber = 0;
@@ -109,15 +109,10 @@
 
         //@TODO: Need to handle "other" scenario for checkbox question. Currently stored in surveyInfo[x].other as a string
 
-        const storage = window.localStorage; 
-        
-        const recentTest = storage["ruralnet-recentTest"] ? storage["ruralnet-recentTest"] : null
-
         let data = {
+                "userId": $session.userid,
                 "date": new Date().toString(),
-                "address": recentTest.address ? recentTest.address : null,
-                "city": recentTest.city ? recentTest.city : null,
-                "state": recentTest.state ? recentTest.state : null,
+                "city": currentTest.city ? currentTest.city : null,
                 "answers": surveyInfo.map(question => {
                     if (question.answerName === 'uses') {
                         //this is for the multi answer (checkbox)
