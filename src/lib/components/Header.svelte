@@ -5,8 +5,8 @@
   import { page } from "$app/stores";
 </script>
 
-<nav class="flex items-center justify-between flex-wrap bg-gray-800 p-6">
-  <div class="flex items-center flex-shrink-0 text-white mr-6">
+<nav class="flex items-center justify-between flex-wrap  p-6">
+  <div class="flex items-center flex-shrink-0  mr-6">
     <span href="/" class="font-bold text-xl">RuralNet</span>
   </div>
 
@@ -15,7 +15,7 @@
       {#if $page.url.pathname !== "/"}
         <a
           href="/"
-          class="block mt-4 sm:inline-block sm:mt-0 text-teal-200 hover:text-white mr-4"
+          class="block mt-4 sm:inline-block sm:mt-0  mr-4"
         >
           Home
         </a>
@@ -23,7 +23,7 @@
       {#if $page.url.pathname !== "/about"}
         <a
           href="about"
-          class="block mt-4 sm:inline-block sm:mt-0 text-teal-200 hover:text-white mr-4"
+          class="block mt-4 sm:inline-block sm:mt-0 mr-4"
         >
           About
         </a>
@@ -32,7 +32,7 @@
     <div>
       <a
         href="/"
-        class="inline-block text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-blue-500 hover:bg-white mt-4 md:mt-0"
+        class="btn"
         >Test Your Speed</a
       >
     </div>

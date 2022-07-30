@@ -26,7 +26,7 @@ const verifyAuth = (request) => {
 };
 
 // get all speedtests
-export async function get({ request, url, params, locals }) {
+export async function GET({ request, url, params, locals }) {
   try {
     if (import.meta.env.DEV) {
       console.log("Returning all docs");
@@ -46,7 +46,7 @@ export async function get({ request, url, params, locals }) {
 }
 
 // delete an entry with given id
-export async function del({ request, url, params, locals }) {
+export async function DELETE({ request, url, params, locals }) {
   if (verifyAuth(request)) {
     try {
       const { id } = request.body;
@@ -73,7 +73,7 @@ export async function del({ request, url, params, locals }) {
   }
 }
 
-export async function post({ request, url, params, locals }) {
+export async function POST({ request, url, params, locals }) {
   const data = await request.json();
   try {
     let newTest, saved;

@@ -2,7 +2,7 @@
  * if good, returns location and lat/long
  * if bad, returns error json
  */
-export async function get({ request, url, params, locals }) {
+export async function GET({ request, url, params, locals }) {
   const key = import.meta.env.DEV
     ? import.meta.env.VITE_MAPQUEST_KEY
     : process.env.MAPQUEST_KEY;

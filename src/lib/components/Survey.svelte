@@ -198,9 +198,9 @@
     
 </style>
 
-<div class='bg-white bg-opacity-80 
+<div class='bg-base-100 bg-opacity-80 
             p-4 w-full h-fit
-            rounded-3xl'>
+            rounded-xl prose'>
     {#if submitted === true}
 
         <div class="w-full text-center py-10">
@@ -219,10 +219,11 @@
             
             <div >
                 {#each surveyInfo[questionNumber].answerOptions as option}
-                    <div >
-                        <input type="radio" id={option} bind:group={surveyInfo[questionNumber].answer}  value={option}>
-                        <span ></span>
-                        <label for="name" >{option}</label>
+                    <div class='form-control'>
+                        <label class='label cursor-pointer justify-start' for="name" >   
+                            <input class='radio radio-secondary' type="radio" id={option} bind:group={surveyInfo[questionNumber].answer}  value={option}>
+                            <span class='label-text ml-5'>{option}</span>
+                        </label>
                     </div>
                 {/each}
             </div> 
@@ -232,11 +233,12 @@
             
                 <div >
                     {#each surveyInfo[questionNumber].answerOptions as option}
-                        <div >
-                            <input type="radio" id={option} bind:group={surveyInfo[questionNumber].answer}  value={option}>
-                            <span ></span>
-                            <label for="name">{option}</label>
-                        </div>
+                    <div class='form-control'>
+                        <label class='label cursor-pointer justify-start' for="name" >   
+                            <input class='radio radio-secondary' type="radio" id={option} bind:group={surveyInfo[questionNumber].answer}  value={option}>
+                            <span class='label-text ml-5'>{option}</span>
+                        </label>
+                    </div>
                     {/each}
                 </div> 
             
@@ -245,11 +247,12 @@
             
                 <div >
                     {#each surveyInfo[questionNumber].answerOptions as option}
-                        <div >
-                            <input type="radio" id={option} bind:group={surveyInfo[questionNumber].answer}  value={option}>
-                            <span ></span>
-                            <label for="name">{option}</label>
-                        </div>
+                    <div class='form-control'>
+                        <label class='label cursor-pointer justify-start' for="name" >   
+                            <input class='radio radio-secondary' type="radio" id={option} bind:group={surveyInfo[questionNumber].answer}  value={option}>
+                            <span class='label-text ml-5'>{option}</span>
+                        </label>
+                    </div>
                     {/each}
                 </div>
             
@@ -258,14 +261,21 @@
             
                 <div >
                     {#each surveyInfo[questionNumber].answerOptions as option}
-                        <div >
-                            <input type="checkbox"  id={option} bind:group={usesCheckboxAnswers} value={option}>
-                            <span ></span>
-                            <label >{option}</label>
-                            {#if option == 'Other'}
-                                <input type="text" name={option} id={option} bind:value={surveyInfo[questionNumber].other}>
-                            {/if}
-                        </div>   
+                        {#if option == 'Other'}
+                            <div class='form-control'>
+                                <label class='label cursor-pointer justify-start' for="name" >   
+                                    <input type="text" name={option} id={option} bind:value={surveyInfo[questionNumber].other}>
+                                    <span class='label-text ml-5'>{option}</span>
+                                </label>
+                            </div> 
+                        {:else}
+                            <div class='form-control'>
+                                <label class='label cursor-pointer justify-start' for="name" >   
+                                    <input class='checkbox checkbox-secondary' type="checkbox" id={option} bind:group={usesCheckboxAnswers} value={option}>
+                                    <span class='label-text ml-5'>{option}</span>
+                                </label>
+                            </div> 
+                        {/if}
                     {/each}
                 </div>
             
@@ -273,17 +283,18 @@
         
             <div >
                 {#each surveyInfo[questionNumber].answerOptions as option}
-                    <div >
-                        <input type="radio" id={option} bind:group={surveyInfo[questionNumber].answer}  value={option}>
-                        <span ></span>
-                        <label for="name">{option}</label>
-                    </div>
+                <div class='form-control'>
+                    <label class='label cursor-pointer justify-start' for="name" >   
+                        <input class='radio radio-secondary' type="radio" id={option} bind:group={surveyInfo[questionNumber].answer}  value={option}>
+                        <span class='label-text ml-5'>{option}</span>
+                    </label>
+                </div>
                 {/each}
             </div>
         
 
         {:else if questionNumber === 5}
-            <textarea class="min-w-full" bind:value={surveyInfo[questionNumber].answer} rows="4"></textarea>
+            <textarea class="textarea w-full" bind:value={surveyInfo[questionNumber].answer} rows="4"></textarea>
         {:else}
             <div>Error: Input for this survey question has not been accounted for. (index:{questionNumber} of surveyInfo.  Component: Survey.svelte)</div>
         {/if}
@@ -295,10 +306,10 @@
         {/if}
         <div class="my-5 w-full flex justify-center">
             {#if questionNumber !== 0}
-                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 mx-2 rounded" on:click={prevQuestion}>←</button>
+                <button class="btn btn-secondary min-w-[50px] mx-2" on:click={prevQuestion}>←</button>
             {/if}
             {#if questionNumber !== (surveyInfo.length - 1)}
-                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 mx-2 rounded" on:click={nextQuestion}>→</button>
+                <button class="btn btn-secondary min-w-[50px] mx-2" on:click={nextQuestion}>→</button>
             {/if}
         </div>
         

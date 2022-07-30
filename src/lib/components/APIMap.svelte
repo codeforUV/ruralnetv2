@@ -71,4 +71,4 @@
   @import "https://unpkg.com/leaflet@1.7.1/dist/leaflet.css";
 </style>
 
-<div id="map" class="min-h-full min-w-full" />
+<div id="map" class="min-h-full min-w-full z-0" />

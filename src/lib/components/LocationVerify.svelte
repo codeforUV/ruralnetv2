@@ -70,16 +70,13 @@
         <form class="flex" on:submit|preventDefault={queryAddress}>
           <input
             type="text"
-            class="appearance-none block w-full bg-white text-gray-700 border
-        border-gray-200 rounded py-2 px-4 leading-tight focus:outline-none
-        focus:border-gray-500"
+            class="input"
             name="address"
             required
             placeholder={$currentTest.city}
           />
           <button
-            class="px-8 py-2 bg-blue-500 hover:bg-blue-700 text-white cursor-pointer
-        text-lg"
+            class="btn"
             type="submit">Submit</button
           >
         </form>
@@ -89,11 +86,11 @@
       </div>
     {:else}
       <button
-        class="px-8 py-4 bg-red-500 hover:bg-red-700 text-white rounded-full cursor-pointer text-lg"
+        class="btn btn-error min-w-[100px]"
         on:click={() => (showAddressInput = true)}>Not quite</button
       >
       <button
-        class="px-8 py-4 bg-green-500 hover:bg-green-700 text-white rounded-full cursor-pointer text-lg"
+    class="btn btn-success min-w-[100px]"
         on:click={startTest}>Yes</button
       >
     {/if}

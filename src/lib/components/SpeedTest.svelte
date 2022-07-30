@@ -23,10 +23,10 @@
 
   // Create some initial values for UI
   let headerText = "Take a new test";
-  let showStartButton = true;
+  let showStartButton = false; //change back to true
   let showSurveyButton = false;
   let showLastTestDate = false;
-  let showSurvey = false;
+  let showSurvey = true; //change back to false
   let showLocationVerify = false;
   let buttonText = "Start";
   let loading = false;
@@ -124,7 +124,7 @@
 {:else}
   <div
     class="grid grid-rows-[repeat(12,_minmax(0,_1fr))] grid-cols-3 bg-white bg-opacity-80 p-4 w-full h-96 text-center
-rounded-3xl"
+rounded-xl"
   >
     <!-- Header text row  -->
     <div class="col-span-3 row-span-3 row-start-1">
@@ -151,7 +151,7 @@ rounded-3xl"
       {#if showStartButton}
         <div class="col-span-3 row-start-4 row-span-3">
           <button
-            class="px-8 py-4 bg-blue-500 hover:bg-blue-700 text-white rounded-full cursor-pointer text-3xl"
+            class="btn btn-lg btn-primary"
             on:click={prepareTest}>{buttonText}</button
           >
         </div>
@@ -159,7 +159,7 @@ rounded-3xl"
       {#if showSurveyButton}
         <div class="col-span-3 row-start-4 row-span-3">
           <button
-            class="px-8 py-4 bg-blue-500 text-white rounded-full cursor-pointer text-xl hover:bg-blue-700"
+            class="btn btn-info"
             on:click={startSurvey}>Take a Quick Survey!</button
           >
         </div>

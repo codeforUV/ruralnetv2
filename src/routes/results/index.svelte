@@ -33,8 +33,11 @@
   export let data = [];
 </script>
 
+<div class='prose'>
 <h1 class="text-4xl pt-8 pl-8 mb-6">Test Results</h1>
 
 <div class="p-4 w-screen h-[80vh]">
   <ApiMap {data} />
+</div>
+
 </div>

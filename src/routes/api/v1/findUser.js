@@ -3,7 +3,7 @@
 import { SpeedTest } from "$lib/models.js";
 import { parse } from "cookie";
 
-export async function get({ request, url }) {
+export async function GET({ request, url }) {
   const { userid } = parse(request.headers.get("cookie"));
   const ip_address = url.searchParams.get("ip") || "";
   if (userid && ip_address) {

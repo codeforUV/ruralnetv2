@@ -27,7 +27,7 @@
   <title>About</title>
 </svelte:head>
 
-<div class="p-8">
+<div class="container mx-auto p-8 prose">
   <h1 class="text-4xl mb-6">About</h1>
 
   <p class="mb-4">

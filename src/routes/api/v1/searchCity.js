@@ -1,6 +1,6 @@
 // PUBLIC API that takes a coordinate pair and will return the name of the town + state
 // that the coordinate is (probably) in by doing a radius search using the Mapquest
-export async function get({ request, url }) {
+export async function GET({ request, url }) {
   const latlng = url.searchParams.get("latlng");
   const numResults = url.searchParams.get("matches") || 3;
 
