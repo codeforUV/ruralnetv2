@@ -23,10 +23,10 @@
 
   // Create some initial values for UI
   let headerText = "Take a new test";
-  let showStartButton = false; //change back to true
+  let showStartButton = true;
   let showSurveyButton = false;
   let showLastTestDate = false;
-  let showSurvey = true; //change back to false
+  let showSurvey = false;
   let showLocationVerify = false;
   let buttonText = "Start";
   let loading = false;

@@ -213,14 +213,14 @@
     <p class='w-full text-left'>{questionNumber + 1} of {surveyInfo.length}</p>
 
         <div class="container px-10">
-        <p class='my-4 text-center text-xl'>{surveyInfo[questionNumber].question}</p>
+        <h2 class=''>{surveyInfo[questionNumber].question}</h2>
         <div class="my-4 flex justify-center">
         {#if questionNumber === 0}
             
             <div >
                 {#each surveyInfo[questionNumber].answerOptions as option}
                     <div class='form-control'>
-                        <label class='label cursor-pointer justify-start' for="name" >   
+                        <label class='label cursor-pointer justify-start' >   
                             <input class='radio radio-secondary' type="radio" id={option} bind:group={surveyInfo[questionNumber].answer}  value={option}>
                             <span class='label-text ml-5'>{option}</span>
                         </label>
@@ -234,7 +234,7 @@
                 <div >
                     {#each surveyInfo[questionNumber].answerOptions as option}
                     <div class='form-control'>
-                        <label class='label cursor-pointer justify-start' for="name" >   
+                        <label class='label cursor-pointer justify-start' >   
                             <input class='radio radio-secondary' type="radio" id={option} bind:group={surveyInfo[questionNumber].answer}  value={option}>
                             <span class='label-text ml-5'>{option}</span>
                         </label>
@@ -248,7 +248,7 @@
                 <div >
                     {#each surveyInfo[questionNumber].answerOptions as option}
                     <div class='form-control'>
-                        <label class='label cursor-pointer justify-start' for="name" >   
+                        <label class='label cursor-pointer justify-start'>   
                             <input class='radio radio-secondary' type="radio" id={option} bind:group={surveyInfo[questionNumber].answer}  value={option}>
                             <span class='label-text ml-5'>{option}</span>
                         </label>
@@ -261,21 +261,12 @@
             
                 <div >
                     {#each surveyInfo[questionNumber].answerOptions as option}
-                        {#if option == 'Other'}
-                            <div class='form-control'>
-                                <label class='label cursor-pointer justify-start' for="name" >   
-                                    <input type="text" name={option} id={option} bind:value={surveyInfo[questionNumber].other}>
-                                    <span class='label-text ml-5'>{option}</span>
-                                </label>
-                            </div> 
-                        {:else}
-                            <div class='form-control'>
-                                <label class='label cursor-pointer justify-start' for="name" >   
-                                    <input class='checkbox checkbox-secondary' type="checkbox" id={option} bind:group={usesCheckboxAnswers} value={option}>
-                                    <span class='label-text ml-5'>{option}</span>
-                                </label>
-                            </div> 
-                        {/if}
+                        <div class='form-control'>
+                            <label class='label cursor-pointer justify-start'>   
+                                <input class='checkbox checkbox-secondary' type="checkbox" id={option} bind:group={usesCheckboxAnswers} value={option}>
+                                <span class='label-text ml-5'>{option}</span>
+                            </label>
+                        </div> 
                     {/each}
                 </div>
             
@@ -284,7 +275,7 @@
             <div >
                 {#each surveyInfo[questionNumber].answerOptions as option}
                 <div class='form-control'>
-                    <label class='label cursor-pointer justify-start' for="name" >   
+                    <label class='label cursor-pointer justify-start'>   
                         <input class='radio radio-secondary' type="radio" id={option} bind:group={surveyInfo[questionNumber].answer}  value={option}>
                         <span class='label-text ml-5'>{option}</span>
                     </label>
