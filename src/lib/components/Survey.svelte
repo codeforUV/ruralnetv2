@@ -199,8 +199,8 @@
 </style>
 
 <div class='bg-base-100 bg-opacity-80 
-            p-4 w-full h-fit
-            rounded-xl prose'>
+            p-4 w-full h-100
+            rounded-xl prose '>
     {#if submitted === true}
 
         <div class="w-full text-center py-10">
@@ -212,9 +212,9 @@
 
     <p class='w-full text-left'>{questionNumber + 1} of {surveyInfo.length}</p>
 
-        <div class="container px-10">
-        <h2 class=''>{surveyInfo[questionNumber].question}</h2>
-        <div class="my-4 flex justify-center">
+        <div class="">
+        <h3 class=''>{surveyInfo[questionNumber].question}</h3>
+        <div class="flex justify-center">
         {#if questionNumber === 0}
             
             <div >

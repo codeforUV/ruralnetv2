@@ -9,7 +9,7 @@
 license requires including a link to the license and attribution -->
 <div class="hero min-h-screen" style="background-image: url(/images/vt_trees_mtns.jpg)">
   <div class="hero-overlay bg-opacity-10"></div>
-  <div class="max-w-lg">
+  <div class="max-w-2xl w-full p-2">
     <SpeedTest />
   </div>
 </div>

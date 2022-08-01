@@ -56,17 +56,17 @@
   };
 </script>
 
-<div class="flex flex-col gap-y-6">
-  <div class="text-xl">
+<div class="flex flex-1 justify-center flex-col gap-5">
+  <div class="text-xl text-center">
     {#if showAddressInput}
       What city and state are you in?
     {:else}
-      Are you in: <span class="italic font-semibold">{$currentTest.city}</span>
+      Is this your location? <br/> <span class="italic font-semibold">{$currentTest.city}</span>
     {/if}
   </div>
-  <div class="flex justify-center space-x-8">
+  <div class="flex justify-center">
     {#if showAddressInput}
-      <div class="flex flex-col w-4/6">
+      <div class="flex flex-col">
         <form class="flex" on:submit|preventDefault={queryAddress}>
           <input
             type="text"
@@ -80,17 +80,18 @@
             type="submit">Submit</button
           >
         </form>
+        <div class='link' on:click={() => (showAddressInput = false)}>Back</div>
         {#if errorText}
           <p class="mt-4 text-sm italic text-red-500">{errorText}</p>
         {/if}
       </div>
     {:else}
       <button
-        class="btn btn-error min-w-[100px]"
+        class="btn btn-error min-w-[100px] m-1"
         on:click={() => (showAddressInput = true)}>Not quite</button
       >
       <button
-    class="btn btn-success min-w-[100px]"
+    class="btn btn-success min-w-[100px] m-1"
         on:click={startTest}>Yes</button
       >
     {/if}

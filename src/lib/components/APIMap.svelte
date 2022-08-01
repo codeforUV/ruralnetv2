@@ -15,6 +15,8 @@
         `;
   };
 
+  let map = null
+
   onMount(async () => {
     if (browser) {
       const leaflet = await import("leaflet");
@@ -40,7 +42,7 @@
         }
       };
 
-      const map = leaflet.map("map").setView([43.827, -72.295], 10);
+      map = leaflet.map("map", {scrollWheelZoom: false}).setView([43.827, -72.295], 10);
 
       leaflet
         .tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -65,10 +67,15 @@
       }
     }
   });
+
+  const handleResize = () => {
+    setTimeout(function(){ map.invalidateSize()}, 310)
+  } 
+  
 </script>
 
 <style>
   @import "https://unpkg.com/leaflet@1.7.1/dist/leaflet.css";
 </style>
 
-<div id="map" class="min-h-full min-w-full z-0" />
+<div id="map" class="min-h-full min-w-full z-0" on:mouseenter={handleResize} />
