@@ -29,7 +29,7 @@
 
 
 {#if show}
-<div class='w-[98vw] min-h-[100px] fixed bottom-[1vh] left-[1vw] rounded border border-gray-500 shadow bg-base-100 px-10 py-5 animate-[bounce_0.5s_1.5]'>
+<div class='w-[98vw] min-h-[100px] fixed bottom-[1vh] left-[1vw] rounded shadow bg-base-300 bg-opacity-90 px-10 py-5 animate-[bounce_0.5s_1.5]'>
     <div class='text-lg font-bold'>Cookies</div> 
     <div class='flex flex-col lg:flex-row justify-between '>
         <div>

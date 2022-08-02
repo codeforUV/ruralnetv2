@@ -51,7 +51,7 @@
       } else if ($currentTest.state === "not started") {
         headerText = "Internet Speed Test";
       } else if ($currentTest.state === "finished") {
-        headerText = "All Done!";
+        headerText = "Complete";
         loading = false;
         showSurveyButton = true;
         showLastTestDate = true;
