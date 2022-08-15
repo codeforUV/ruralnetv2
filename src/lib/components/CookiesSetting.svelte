@@ -37,14 +37,14 @@
     <div>
         {#if cookiesAccepted == 'true'}
             <div>Cookies Status: Accepted</div>
-            <button class='btn decline' on:click={setDecline}>Decline Cookies</button>
+            <button class='btn btn-info' on:click={setDecline}>Decline Cookies</button>
         {:else if cookiesAccepted == 'false'}
             <div>Cookies Status: Declined</div>
-            <button class='btn accept' on:click={setAccept}>Accept Cookies</button>
+            <button class='btn btn-error' on:click={setAccept}>Accept Cookies</button>
         {:else }
             <div>Cookies Status: Undecided</div>
-            <button class='btn accept' on:click={setAccept}>Accept Cookies</button>
-            <button class='btn decline' on:click={setDecline}>Decline Cookies</button>
+            <button class='btn btn-info' on:click={setAccept}>Accept Cookies</button>
+            <button class='btn btn-error' on:click={setDecline}>Decline Cookies</button>
         {/if}
     </div>
 </div>

@@ -5,36 +5,35 @@
   import { page } from "$app/stores";
 </script>
 
-<nav class="flex items-center justify-between flex-wrap bg-gray-800 p-6">
-  <div class="flex items-center flex-shrink-0 text-white mr-6">
-    <span href="/" class="font-bold text-xl">RuralNet</span>
+<nav class='navbar bg-base-100 flex-wrap'>
+  
+  <div class="flex-1 md:hidden">
+    <div class="dropdown flex-1">
+      <label tabindex="0" class="btn btn-ghost btn-circle">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
+      </label>
+      <ul tabindex="0" class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52">
+        <a href="/" class="py-3">Home</a>
+        <a href="about" class="py-3">About</a>
+        <a href="results" class="py-3">Results</a>
+      </ul>
+    </div>
+    <a href="/" class="m-1 font-bold text-xl flex-none">RuralNet</a>
   </div>
 
-  <div class="w-full block flex-grow sm:flex sm:items-center sm:w-auto">
-    <div class="text-sm sm:flex-grow">
-      {#if $page.url.pathname !== "/"}
-        <a
-          href="/"
-          class="block mt-4 sm:inline-block sm:mt-0 text-teal-200 hover:text-white mr-4"
-        >
-          Home
-        </a>
-      {/if}
-      {#if $page.url.pathname !== "/about"}
-        <a
-          href="about"
-          class="block mt-4 sm:inline-block sm:mt-0 text-teal-200 hover:text-white mr-4"
-        >
-          About
-        </a>
-      {/if}
-    </div>
-    <div>
-      <a
-        href="/"
-        class="inline-block text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-blue-500 hover:bg-white mt-4 md:mt-0"
-        >Test Your Speed</a
-      >
-    </div>
+  <div class='hidden basis-full md:block md:navbar-start md:flex-1'>
+    <a href="/" class="m-1 font-bold text-xl">RuralNet</a>
+    
+      <a href="/" class="p-3">Home</a>
+      <a href="about" class="p-3">About</a>
+      <a href="results" class="p-3">Results</a>
+
+   
   </div>
+  
+  {#if $page.url.pathname !== '/'}
+    <div class='basis-full justify-end md:basis-auto'>
+      <a href="/" class="btn w-full md:w-auto" >Test Your Speed</a>
+    </div>
+  {/if}
 </nav>

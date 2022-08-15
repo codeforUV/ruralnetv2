@@ -405,39 +405,3 @@ export class RuralTestResult {
     } on ${new Date(`${this._content.date}T${this._content.time}Z`)}`;
   }
 }
-
-export class ArcGISController {
-  constructor(targetContainer) {
-    require([
-      "esri/config",
-      "esri/Map",
-      "esri/views/MapView",
-      "esri/widgets/Locate",
-
-      "esri/widgets/Track",
-      "esri/Graphic",
-    ], function (
-      esriConfig,
-      Map,
-      MapView,
-      Locate,
-
-      Track,
-      Graphic
-    ) {
-      esriConfig.apiKey =
-        "AAPK465a177b01b849219d7dbf20b61f9723BkAlush_BsVf8cawsGe_ChUG4NBJrUju6ENhasX38WdCdagW4qK7LTPzHZcqS1VA";
-
-      this.map = new Map({
-        basemap: "arcgis-navigation", // Basemap layer service
-      });
-
-      this.view = new MapView({
-        container: targetContainer,
-        map: map,
-        center: [-40, 28],
-        zoom: 2,
-      });
-    });
-  }
-}

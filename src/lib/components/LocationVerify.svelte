@@ -56,44 +56,42 @@
   };
 </script>
 
-<div class="flex flex-col gap-y-6">
-  <div class="text-xl">
+<div class="flex flex-1 justify-center flex-col gap-5">
+  <div class="text-xl text-center">
     {#if showAddressInput}
       What city and state are you in?
     {:else}
-      Are you in: <span class="italic font-semibold">{$currentTest.city}</span>
+      Is this your location? <br/> <span class="italic font-semibold">{$currentTest.city}</span>
     {/if}
   </div>
-  <div class="flex justify-center space-x-8">
+  <div class="flex justify-center">
     {#if showAddressInput}
-      <div class="flex flex-col w-4/6">
+      <div class="flex flex-col">
         <form class="flex" on:submit|preventDefault={queryAddress}>
           <input
             type="text"
-            class="appearance-none block w-full bg-white text-gray-700 border
-        border-gray-200 rounded py-2 px-4 leading-tight focus:outline-none
-        focus:border-gray-500"
+            class="input"
             name="address"
             required
             placeholder={$currentTest.city}
           />
           <button
-            class="px-8 py-2 bg-blue-500 hover:bg-blue-700 text-white cursor-pointer
-        text-lg"
+            class="btn"
             type="submit">Submit</button
           >
         </form>
+        <div class='link' on:click={() => (showAddressInput = false)}>Back</div>
         {#if errorText}
           <p class="mt-4 text-sm italic text-red-500">{errorText}</p>
         {/if}
       </div>
     {:else}
       <button
-        class="px-8 py-4 bg-red-500 hover:bg-red-700 text-white rounded-full cursor-pointer text-lg"
+        class="btn btn-error min-w-[100px] m-1"
         on:click={() => (showAddressInput = true)}>Not quite</button
       >
       <button
-        class="px-8 py-4 bg-green-500 hover:bg-green-700 text-white rounded-full cursor-pointer text-lg"
+    class="btn btn-success min-w-[100px] m-1"
         on:click={startTest}>Yes</button
       >
     {/if}

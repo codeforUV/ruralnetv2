@@ -49,7 +49,7 @@
         headerText = "Welcome Back!";
         buttonText = "Take another test";
       } else if ($currentTest.state === "not started") {
-        headerText = "Take a new test";
+        headerText = "Internet Speed Test";
       } else if ($currentTest.state === "finished") {
         headerText = "Complete";
         loading = false;
@@ -116,130 +116,117 @@
 </script>
 
 {#if showSurvey}
-  <div
-    class="col-span-1 col-start-2 row-start-4 row-span-3 flex items-center justify-center"
-  >
+ 
     <Survey />
-  </div>
+
 {:else}
-  <div
-    class="grid grid-rows-[repeat(12,_minmax(0,_1fr))] grid-cols-3 bg-white bg-opacity-80 p-4 w-full h-96 text-center
-rounded-3xl"
-  >
+  <div class="bg-base-100 bg-opacity-80 rounded-xl prose flex flex-col items-center p-4 w-100 min-h-[450px]">
     <!-- Header text row  -->
-    <div class="col-span-3 row-span-3 row-start-1">
-      <h1 class="text-4xl py-2">{headerText}</h1>
-      <p class="text-sm text-gray-500 italic">{locationConsentText}</p>
+    <div class="flex-none text-center">
+      <h1 class="">{headerText}</h1>
+      <p class="">{locationConsentText}</p>
     </div>
 
     {#if showLocationVerify}
-      <div class="col-span-3 row-start-4 row-span-3">
         <LocationVerify
           on:verified={startTest}
           on:updateLocation={updateLocation}
         />
-      </div>
     {:else}
       <!-- Loading spinner, start button, survey button, or error row -->
       {#if loading}
         <div
-          class="col-span-1 col-start-2 row-start-4 row-span-3 flex items-center justify-center"
+          class=""
         >
           <LoadingSpinner />
         </div>
       {/if}
       {#if showStartButton}
-        <div class="col-span-3 row-start-4 row-span-3">
+        <div class="flex flex-1 items-center">
           <button
-            class="px-8 py-4 bg-blue-500 hover:bg-blue-700 text-white rounded-full cursor-pointer text-3xl"
+            class="btn btn-lg btn-primary"
             on:click={prepareTest}>{buttonText}</button
           >
         </div>
       {/if}
       {#if showSurveyButton}
-        <div class="col-span-3 row-start-4 row-span-3">
+        <div class="">
           <button
-            class="px-8 py-4 bg-blue-500 text-white rounded-full cursor-pointer text-xl hover:bg-blue-700"
+            class="btn btn-info"
             on:click={startSurvey}>Take a Quick Survey!</button
           >
         </div>
       {/if}
       {#if $currentTest.error}
-        <div class="col-span-3 row-start-4 row-span-3">
-          <p class="text-black text-lg">
+        <div class="">
+          <p class="">
             Please contact <a
               href="mailto:ruralnet@codeforuv.org"
-              class="underline
-        text-blue-500 cursor-pointer hover:text-blue-700"
+              class="link"
               >ruralnet@codeforuv.org</a
             > with the following error message:
           </p>
         </div>
-        <div class="col-span-3 row-start-7 row-span-3">
+        <div class="">
           <p class="text-red-600">{$currentTest.errorText}</p>
         </div>
       {/if}
 
       <!-- Last test date row -->
       {#if showLastTestDate}
-        <div class="col-span-3 row-start-7 row-span-1">
+        <div class="">
           <p>{dateText}</p>
         </div>
       {/if}
 
       <!-- Metrics row -->
+      
       {#if !$currentTest.error}
-        {#if $currentTest.ping}
-          <div
-            class="col-span-1 flex flex-col my-auto row-start-[8] row-span-3"
-          >
-            <p class="text-3xl">
-              {$currentTest.ping} <span class="text-2xl">ms</span>
-            </p>
-            <p class="text-gray-500">Ping</p>
-          </div>
-        {/if}
-        {#if $currentTest.downloadSpeed}
-          <div
-            class="col-span-1 flex flex-col my-auto row-start-[8] row-span-3"
-          >
-            <p class="text-3xl">
-              {$currentTest.downloadSpeed} <span class="text-2xl">mb/s</span>
-            </p>
-            <p class="text-gray-500">Download</p>
-          </div>
-        {/if}
-        {#if $currentTest.uploadSpeed}
-          <div
-            class="col-span-1 flex flex-col my-auto row-start-[8] row-span-3"
-          >
-            <p class="text-3xl">
-              {$currentTest.uploadSpeed} <span class="text-2xl">mb/s</span>
-            </p>
-            <p class="text-gray-500">Upload</p>
-          </div>
-        {/if}
-
+      
+        <div class="flex justify-center w-3/4">
+          {#if $currentTest.downloadSpeed}
+            <div class="flex flex-col w-1/2" >
+              <div class="text-3xl self-center md:text-5xl">{$currentTest.downloadSpeed}</div>
+              <div class="self-center">Download</div>
+              <span class='text-xs self-center'>(mb/s)</span>
+            </div>
+          {/if}
+          {#if $currentTest.uploadSpeed}
+            <div class="flex flex-col w-1/2" >
+              <div class="text-3xl self-center md:text-5xl">{$currentTest.uploadSpeed}</div>
+              <div class="self-center">Upload</div>
+              <span class='text-xs self-center'>(mb/s)</span>
+            </div>
+          {/if}
+        </div>
+        <div class='flex justify-center basis-full w-full pt-2 pb-5'>
+          {#if $currentTest.ping}
+            <div class="" >
+              <div class="text-xs">Ping: {$currentTest.ping}<span class="">ms</span> </div>
+            </div>
+          {/if}
+        </div>
+      
         <!-- Location row -->
         {#if $currentTest.city}
-          <div
-            class="row-start-[11] row-span-1 col-start-2 text-center text-lg text-gray-500 italic "
-          >
-            <p>{$currentTest.city}</p>
+          <div class="flex flex-col items-center flex-wrap pb-5">
+            <div class='flex'>
+              <div>
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+              </div>
+              <div>{$currentTest.city}</div>
+            </div>
             {#if $currentTest.locationPrecision}
-              <p class="text-sm">
+              <div class="text-xs">
                 (Location accuracy: {$currentTest.locationPrecision})
-              </p>
+              </div>
             {/if}
           </div>
         {/if}
 
         <!-- Link to results map row -->
         {#if !loading}
-          <div
-            class="row-start-[12] row-span-1 col-start-2 text-center text-sm text-blue-500
-  underline pt-5"
-          >
+          <div class="link flex-none">
             <a href="/results">Go to Results Map →</a>
           </div>
         {/if}

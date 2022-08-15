@@ -9,7 +9,7 @@
 // guidelines in the sveltekit node-apapter docs: https://github.com/sveltejs/kit/tree/master/packages/adapter-node
 import randomBytes from "random-bytes";
 
-export async function get({ request }) {
+export async function GET({ request }) {
   const requestedSize = 100;
   let b;
   let cache = null;
@@ -45,7 +45,7 @@ export async function get({ request }) {
   };
 }
 
-export async function post({ request }) {
+export async function POST({ request }) {
   // do nothing
   return {
     status: 200,

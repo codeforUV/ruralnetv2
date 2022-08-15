@@ -33,11 +33,11 @@ const SpeedTestSchema = new Schema({
 });
 
 const SurveySubmissionsSchema = new Schema({
+  userID: String,
   date: {
     type: String,
     default: Date.now(),
   },
-  address: String,
   city: String,
   state: String,
   answers: [

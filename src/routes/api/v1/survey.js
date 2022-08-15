@@ -15,7 +15,7 @@ The return object should be a standard HTTP response object including at least {
 
 // Public API that saves a test result
 
-export async function get({ request }) {
+export async function GET({ request }) {
 
     const surveys = await SurveySubmissions.find({}).exec();
 
@@ -33,7 +33,7 @@ export async function get({ request }) {
 
 }
 
-export async function post({ request, url, params, locals, platform }) {
+export async function POST({ request, url, params, locals, platform }) {
 
     try {
 

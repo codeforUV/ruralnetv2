@@ -1,9 +1,9 @@
 <script>
 
+    import { currentTest } from "$lib/stores";
+    import { session } from "$app/stores";
 
     export let submitted = false;
-
-    
 
     // Initialize memory for variables
     let questionNumber = 0;
@@ -109,15 +109,10 @@
 
         //@TODO: Need to handle "other" scenario for checkbox question. Currently stored in surveyInfo[x].other as a string
 
-        const storage = window.localStorage; 
-        
-        const recentTest = storage["ruralnet-recentTest"] ? storage["ruralnet-recentTest"] : null
-
         let data = {
+                "userId": $session.userid,
                 "date": new Date().toString(),
-                "address": recentTest.address ? recentTest.address : null,
-                "city": recentTest.city ? recentTest.city : null,
-                "state": recentTest.state ? recentTest.state : null,
+                "city": currentTest.city ? currentTest.city : null,
                 "answers": surveyInfo.map(question => {
                     if (question.answerName === 'uses') {
                         //this is for the multi answer (checkbox)
@@ -203,9 +198,9 @@
     
 </style>
 
-<div class='bg-white bg-opacity-80 
-            p-4 w-full h-fit
-            rounded-3xl'>
+<div class='bg-base-100 bg-opacity-80 
+            p-4 w-full h-100
+            rounded-xl prose '>
     {#if submitted === true}
 
         <div class="w-full text-center py-10">
@@ -217,17 +212,18 @@
 
     <p class='w-full text-left'>{questionNumber + 1} of {surveyInfo.length}</p>
 
-        <div class="container px-10">
-        <p class='my-4 text-center text-xl'>{surveyInfo[questionNumber].question}</p>
-        <div class="my-4 flex justify-center">
+        <div class="">
+        <h3 class=''>{surveyInfo[questionNumber].question}</h3>
+        <div class="flex justify-center">
         {#if questionNumber === 0}
             
             <div >
                 {#each surveyInfo[questionNumber].answerOptions as option}
-                    <div >
-                        <input type="radio" id={option} bind:group={surveyInfo[questionNumber].answer}  value={option}>
-                        <span ></span>
-                        <label for="name" >{option}</label>
+                    <div class='form-control'>
+                        <label class='label cursor-pointer justify-start' >   
+                            <input class='radio radio-secondary' type="radio" id={option} bind:group={surveyInfo[questionNumber].answer}  value={option}>
+                            <span class='label-text ml-5'>{option}</span>
+                        </label>
                     </div>
                 {/each}
             </div> 
@@ -237,11 +233,12 @@
             
                 <div >
                     {#each surveyInfo[questionNumber].answerOptions as option}
-                        <div >
-                            <input type="radio" id={option} bind:group={surveyInfo[questionNumber].answer}  value={option}>
-                            <span ></span>
-                            <label for="name">{option}</label>
-                        </div>
+                    <div class='form-control'>
+                        <label class='label cursor-pointer justify-start' >   
+                            <input class='radio radio-secondary' type="radio" id={option} bind:group={surveyInfo[questionNumber].answer}  value={option}>
+                            <span class='label-text ml-5'>{option}</span>
+                        </label>
+                    </div>
                     {/each}
                 </div> 
             
@@ -250,11 +247,12 @@
             
                 <div >
                     {#each surveyInfo[questionNumber].answerOptions as option}
-                        <div >
-                            <input type="radio" id={option} bind:group={surveyInfo[questionNumber].answer}  value={option}>
-                            <span ></span>
-                            <label for="name">{option}</label>
-                        </div>
+                    <div class='form-control'>
+                        <label class='label cursor-pointer justify-start'>   
+                            <input class='radio radio-secondary' type="radio" id={option} bind:group={surveyInfo[questionNumber].answer}  value={option}>
+                            <span class='label-text ml-5'>{option}</span>
+                        </label>
+                    </div>
                     {/each}
                 </div>
             
@@ -263,14 +261,12 @@
             
                 <div >
                     {#each surveyInfo[questionNumber].answerOptions as option}
-                        <div >
-                            <input type="checkbox"  id={option} bind:group={usesCheckboxAnswers} value={option}>
-                            <span ></span>
-                            <label >{option}</label>
-                            {#if option == 'Other'}
-                                <input type="text" name={option} id={option} bind:value={surveyInfo[questionNumber].other}>
-                            {/if}
-                        </div>   
+                        <div class='form-control'>
+                            <label class='label cursor-pointer justify-start'>   
+                                <input class='checkbox checkbox-secondary' type="checkbox" id={option} bind:group={usesCheckboxAnswers} value={option}>
+                                <span class='label-text ml-5'>{option}</span>
+                            </label>
+                        </div> 
                     {/each}
                 </div>
             
@@ -278,17 +274,18 @@
         
             <div >
                 {#each surveyInfo[questionNumber].answerOptions as option}
-                    <div >
-                        <input type="radio" id={option} bind:group={surveyInfo[questionNumber].answer}  value={option}>
-                        <span ></span>
-                        <label for="name">{option}</label>
-                    </div>
+                <div class='form-control'>
+                    <label class='label cursor-pointer justify-start'>   
+                        <input class='radio radio-secondary' type="radio" id={option} bind:group={surveyInfo[questionNumber].answer}  value={option}>
+                        <span class='label-text ml-5'>{option}</span>
+                    </label>
+                </div>
                 {/each}
             </div>
         
 
         {:else if questionNumber === 5}
-            <textarea class="min-w-full" bind:value={surveyInfo[questionNumber].answer} rows="4"></textarea>
+            <textarea class="textarea w-full" bind:value={surveyInfo[questionNumber].answer} rows="4"></textarea>
         {:else}
             <div>Error: Input for this survey question has not been accounted for. (index:{questionNumber} of surveyInfo.  Component: Survey.svelte)</div>
         {/if}
@@ -300,10 +297,10 @@
         {/if}
         <div class="my-5 w-full flex justify-center">
             {#if questionNumber !== 0}
-                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 mx-2 rounded" on:click={prevQuestion}>←</button>
+                <button class="btn btn-secondary min-w-[50px] mx-2" on:click={prevQuestion}>←</button>
             {/if}
             {#if questionNumber !== (surveyInfo.length - 1)}
-                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 mx-2 rounded" on:click={nextQuestion}>→</button>
+                <button class="btn btn-secondary min-w-[50px] mx-2" on:click={nextQuestion}>→</button>
             {/if}
         </div>
         

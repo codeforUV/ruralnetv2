@@ -12,10 +12,10 @@ import CookiesSetting from "$lib/components/CookiesSetting.svelte"
   }
 </style>
 
-<div class="p-8">
-  <h1 class='text-4xl mb-6'>Privacy Settings</h1>
+<div class="container mx-auto p-8 prose">
+  <h1 class=''>Privacy Settings</h1>
   <CookiesSetting/>
-  <h2 class="text-3xl mb-6">Privacy Policy</h2>
+  <h2 class="">Privacy Policy</h2>
   <p>
     RuralNet ("The Website"), a project of Code for Upper Valley ("We", "Us"), respects your privacy and believes that you deserve to know what we do with your data.
   </p>

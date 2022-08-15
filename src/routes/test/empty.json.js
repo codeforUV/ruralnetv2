@@ -1,6 +1,6 @@
 // Required end-point by speedtest.js
 // Modeled after original php code: https://github.com/librespeed/speedtest/blob/master/backend/empty.php
-export async function get({ request }) {
+export async function GET({ request }) {
   return {
     status: 200,
     headers: {
@@ -15,7 +15,7 @@ export async function get({ request }) {
   };
 }
 
-export async function post({ request }) {
+export async function POST({ request }) {
   return {
     status: 200,
     headers: {

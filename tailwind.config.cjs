@@ -1,7 +1,15 @@
 module.exports = {
   content: ["./src/**/*.{html,js,svelte,ts}"],
   theme: {
-    extend: {},
+    extend: {
+      transitionProperty: {
+        'width': 'width',
+      }
+    },
   },
-  plugins: [],
+  plugins: [require("@tailwindcss/typography"), require("daisyui")],
+  daisyui: {
+    themes: ['emerald', 'business'],
+    // darkTheme: 'business'
+  }
 };
