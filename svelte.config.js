@@ -5,13 +5,8 @@ import adapter from "@sveltejs/adapter-node";
 const config = {
   kit: {
     adapter: adapter({
-      env: {
-        origin: "ORIGIN",
-        headers: {
-          protocol: "PROTOCOL_HEADER",
-          host: "HOST_HEADER",
-        },
-      },
+      envPrefix: '',
+      
     }),
     // vite: {
     //   define: {

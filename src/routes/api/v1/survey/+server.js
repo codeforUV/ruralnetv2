@@ -1,3 +1,4 @@
+import { json as json$1 } from '@sveltejs/kit';
 import { SurveySubmissions } from "$lib/models.js";
 
 /*
@@ -20,15 +21,11 @@ export async function GET({ request }) {
     const surveys = await SurveySubmissions.find({}).exec();
 
     if (surveys) {
-        return {
-            status: 201,
-            body: { surveys }
-        }
+        return json$1({ surveys }, {
+          status: 201
+        })
     } else {
-        return {
-            status: 404,
-            body: "No surveys found",
-        };
+        return new Response("No surveys found", { status: 404 });
     }
 
 }
@@ -38,32 +35,19 @@ export async function POST({ request, url, params, locals, platform }) {
     try {
 
         const data = await request.json();
-
         newSurvey = new SurveySubmissions(data);
         saved = await newSurvey.save();
-
         if (saved === newSurvey) {
-            return {
-                status: 200,
-                body: JSON.stringify({
-                    resp: "Data saved successfully",
-                    entryId: newSurvey._id,
-                }),
-            };
+            return new Response(JSON.stringify({
+                resp: "Data saved successfully",
+                entryId: newSurvey._id,
+            }));
         } else {
-            return {
-                status: 500,
-                resp: JSON.stringify({
-                    resp: "Problem saving data",
-                }),
-            };
+            return new Response(undefined, { status: 500 });
         }
 
     } catch (error) {
-        return {
-            status: 500,
-            body: JSON.stringify(error),
-        };
+        return new Response(JSON.stringify(error), { status: 500 });
     }
     
         

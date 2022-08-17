@@ -5,7 +5,7 @@
   // to reactively update the UI.
   import { createEventDispatcher, onMount } from "svelte";
   import { RuralTest } from "$lib/classes.js";
-  import { session } from "$app/stores";
+  import { page } from '$app/stores';
   import { currentTest } from "$lib/stores";
 
   import Survey from "./Survey.svelte";
@@ -19,7 +19,7 @@
   const dispatch = createEventDispatcher();
 
   // Initialize a new instance of the class that handles speed tests
-  const speedTest = new RuralTest(logging, upload, $session.userid);
+  const speedTest = new RuralTest(logging, upload, $page.data.user);
 
   // Create some initial values for UI
   let headerText = "Take a new test";

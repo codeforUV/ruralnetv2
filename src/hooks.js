@@ -5,9 +5,9 @@ import mongoose from "mongoose";
 
 // First try reading the mongodb URI from the currently running node process
 // This will have the correct value when running on heroku as the connection string was set in the admin panel
-let { MONGODB_URI } = process.env;
+let { MONGODB_URI } = import.meta.env;
 // Replace the value of MONGODB_URI with the value in the .env.local if we're running the app locally
-MONGODB_URI = dev ? import.meta.env.VITE_MONGODB_URI : MONGODB_URI;
+MONGODB_URI = import.meta.env.VITE_MONGODB_URI
 
 // This function runs *every time* a request is made to the server. This allows us to
 // see if we have a database connection and if not establish one. We also use this
@@ -46,9 +46,4 @@ export const handle = async ({ event, resolve }) => {
     console.log("Internal request...skipping cookie assignment");
   }
   return response;
-};
-
-// Make their user is available in the client-side sveltestore $session
-export const getSession = (request) => {
-  return request.locals;
 };

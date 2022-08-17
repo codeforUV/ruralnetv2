@@ -7,9 +7,9 @@ export async function GET({ request, url }) {
   let apiReq, searchResults;
   let cityCounts = {};
   if (latlng) {
-    const key = import.meta.env.DEV
-      ? import.meta.env.VITE_MAPQUEST_KEY
-      : process.env.MAPQUEST_KEY;
+    const key = import.meta.env.VITE_MAPQUEST_KEY
+      console.log(import.meta.env.VITE_MAPQUEST_KEY);
+      console.log(process.env.MAPQUEST_KEY)
     let url = `https://www.mapquestapi.com/search/v2/radius?key=${key}&origin=${latlng}&maxMatches=${numResults}`;
     try {
       apiReq = await fetch(url);
@@ -40,20 +40,11 @@ export async function GET({ request, url }) {
           };
         }
       });
-      return {
-        status: 200,
-        body: JSON.stringify(output),
-      };
+      return new Response(JSON.stringify(output));
     } catch (error) {
-      return {
-        status: 500,
-        body: JSON.stringify({ error }),
-      };
+      return new Response(JSON.stringify({ error }), { status: 500 });
     }
   } else {
-    return {
-      status: 404,
-      body: "latlng query param missing",
-    };
+    return new Response("latlng query param missing", { status: 404 });
   }
 }

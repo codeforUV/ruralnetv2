@@ -1,8 +1,7 @@
 // Required end-point by speedtest.js
 // Modeled after original php code: https://github.com/librespeed/speedtest/blob/master/backend/empty.php
 export async function GET({ request }) {
-  return {
-    status: 200,
+  return new Response(undefined, {
     headers: {
       Connection: "keep-alive",
       "Access-Control-Allow-Origin": "*",
@@ -11,13 +10,12 @@ export async function GET({ request }) {
       Pragma: "no-cache",
       "Cache-Control":
         "no-store, no-cache, must-revalidate, max-age=0, post-check=0, pre-check=0",
-    },
-  };
+    }
+  });
 }
 
 export async function POST({ request }) {
-  return {
-    status: 200,
+  return new Response(undefined, {
     headers: {
       Connection: "keep-alive",
       "Access-Control-Allow-Origin": "*",
@@ -26,6 +24,6 @@ export async function POST({ request }) {
       Pragma: "no-cache",
       "Cache-Control":
         "no-store, no-cache, must-revalidate, max-age=0, post-check=0, pre-check=0",
-    },
-  };
+    }
+  });
 }

@@ -1,3 +1,4 @@
+import { json as json$1 } from '@sveltejs/kit';
 import { SpeedTest } from "$lib/models.js";
 
 /* To guard against direct database read/write/delete access using REST calls to
@@ -32,16 +33,10 @@ export async function GET({ request, url, params, locals }) {
       console.log("Returning all docs");
     }
     const docs = await SpeedTest.find({}).exec();
-    return {
-      status: 200,
-      body: { docs },
-    };
+    return json$1({ docs });
   } catch (err) {
     console.log(err.stack);
-    return {
-      status: 500,
-      resp: JSON.stringify({ resp: err.stack }),
-    };
+    return new Response(undefined, { status: 500 });
   }
 }
 
@@ -55,21 +50,13 @@ export async function DELETE({ request, url, params, locals }) {
       }
       // NOTE: Commented out by default; uncomment while testing
       // await SpeedTest.deleteOne({ _id: id });
-      return {
-        resp: JSON.stringify({ resp: "document sucessfully deleted" }),
-      };
+      return new Response(undefined);
     } catch (err) {
       console.log(err.stack);
-      return {
-        status: 500,
-        resp: JSON.stringify({ resp: err.stack }),
-      };
+      return new Response(undefined, { status: 500 });
     }
   } else {
-    return {
-      status: 403,
-      body: "This is not a public API",
-    };
+    return new Response("This is not a public API", { status: 403 });
   }
 }
 
@@ -95,26 +82,15 @@ export async function POST({ request, url, params, locals }) {
       saved = await newTest.save();
     }
     if (saved === newTest) {
-      return {
-        status: 200,
-        body: JSON.stringify({
-          resp: "Data saved successfully",
-          entryId: newTest._id,
-        }),
-      };
+      return new Response(JSON.stringify({
+  resp: "Data saved successfully",
+  entryId: newTest._id,
+}));
     } else {
-      return {
-        status: 500,
-        resp: JSON.stringify({
-          resp: "Probelm saving data",
-        }),
-      };
+      return new Response(undefined, { status: 500 });
     }
   } catch (err) {
     console.log(err.stack);
-    return {
-      status: 500,
-      resp: JSON.stringify({ resp: err.stack }),
-    };
+    return new Response(undefined, { status: 500 });
   }
 }

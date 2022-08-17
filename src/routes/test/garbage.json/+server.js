@@ -1,3 +1,4 @@
+import { json } from '@sveltejs/kit';
 // Required end-point by speedtest.js
 // Modeled after original php code:
 // https://github.com/librespeed/speedtest/blob/master/backend/garbage.php
@@ -30,8 +31,7 @@ export async function GET({ request }) {
   //   }
   // }
 
-  return {
-    status: 200,
+  return new Response(await randomBytes(1048576), {
     headers: {
       "Content-Type": "application/octet-stream",
       "Content-Description": "File Transfer",
@@ -40,15 +40,11 @@ export async function GET({ request }) {
       Pragma: "no-cache",
       "Cache-Control":
         "no-store, no-cache, must-revalidate, max-age=0, post-check=0, pre-check=0",
-    },
-    body: await randomBytes(1048576),
-  };
+    }
+  });
 }
 
 export async function POST({ request }) {
   // do nothing
-  return {
-    status: 200,
-    body: {},
-  };
+  return json({});
 }

@@ -34,19 +34,14 @@ export async function GET({ request, url, params, locals }) {
       userInput = location;
       checkedAgainst = `${userResultCity},${userResultState}`;
     }
-    return {
-      body: JSON.stringify({
-        verified,
-        userInput,
-        city,
-        latlng,
-        checkedAgainst,
-      }),
-    };
+    return new Response(JSON.stringify({
+  verified,
+  userInput,
+  city,
+  latlng,
+  checkedAgainst,
+}));
   } else {
-    return {
-      status: 404,
-      body: "location query param missing",
-    };
+    return new Response("location query param missing", { status: 404 });
   }
 }

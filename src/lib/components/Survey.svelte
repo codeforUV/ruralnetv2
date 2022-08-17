@@ -1,7 +1,7 @@
 <script>
 
     import { currentTest } from "$lib/stores";
-    import { session } from "$app/stores";
+    import { page } from '$app/stores';
 
     export let submitted = false;
 
@@ -110,7 +110,7 @@
         //@TODO: Need to handle "other" scenario for checkbox question. Currently stored in surveyInfo[x].other as a string
 
         let data = {
-                "userId": $session.userid,
+                "userId": $page.data.userid,
                 "date": new Date().toString(),
                 "city": currentTest.city ? currentTest.city : null,
                 "answers": surveyInfo.map(question => {
