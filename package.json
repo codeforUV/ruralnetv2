@@ -31,6 +31,7 @@
     "@lukeed/uuid": "^2.0.0",
     "cookie": "^0.4.1",
     "daisyui": "^2.20.0",
+    "devalue": "^2.0.1",
     "dotenv": "^16.0.0",
     "leaflet": "^1.7.1",
     "mongoose": "^6.2.0",
