@@ -7,11 +7,16 @@ import { parse, serialize } from "cookie";
 
 /** @type {import('./$types').LayoutServerLoad} */
 export async function load({ request, setHeaders }) {
+    const cookieString = request.headers.get('cookie')
 
-    const cookie = parse(request.headers.get('cookie'))
+    const cookie = cookieString ? parse(cookieString.toString()) : null
+    let _userid = ''
+    if (cookie) {
+        _userid = cookie.userid
+    }
 
     return {
-        userid: cookie.userid
+        userid: _userid
       };
     
   }
