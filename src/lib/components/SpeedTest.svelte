@@ -19,7 +19,7 @@
   const dispatch = createEventDispatcher();
 
   // Initialize a new instance of the class that handles speed tests
-  const speedTest = new RuralTest(logging, upload, $page.data.user);
+  const speedTest = new RuralTest(logging, upload, $page.data.userid);
 
   // Create some initial values for UI
   let headerText = "Take a new test";
@@ -104,7 +104,6 @@
   };
 
   const startSurvey = () => {
-    console.log("Show survey");
     showSurvey = true;
     showStartButton = false;
   };

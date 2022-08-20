@@ -34,6 +34,7 @@ const SpeedTestSchema = new Schema({
 
 const SurveySubmissionsSchema = new Schema({
   userID: String,
+  speedTestID: String,
   date: {
     type: String,
     default: Date.now(),
