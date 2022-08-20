@@ -35,7 +35,7 @@ export async function POST({ request, url, params, locals, platform }) {
 
         const data = await request.json();
         const newSurvey = new SurveySubmissions(data);
-        saved = await newSurvey.save();
+        const saved = await newSurvey.save();
         
         if (saved === newSurvey) {
             return new Response(JSON.stringify({
