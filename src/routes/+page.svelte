@@ -1,5 +1,6 @@
 <script>
   import SpeedTest from "$lib/components/SpeedTest.svelte";
+
 </script>
 
 <svelte:head>

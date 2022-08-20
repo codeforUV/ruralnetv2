@@ -4,7 +4,6 @@
     import { page } from '$app/stores';
 
     export let submitted = false;
-
     // Initialize memory for variables
     let questionNumber = 0;
     let message = null
@@ -16,7 +15,7 @@
     //survey questions and answer options
     let surveyInfo = [
             {
-                _id: 1,
+                questionId: 1,
                 question: "When you connect to the internet at home, do you:",
                 answerName: "connection",
                 answerType: "radio",
@@ -30,7 +29,7 @@
                 
             },
             {
-                _id: 2,
+                questionId: 2,
                 question: "Approximately how many other devices are using your internet while you ran the test? (Other people in your home that are online, Alexa, smart home devices, security cameras, etc.)",
                 answerName: "devices",
                 answerType: "radio",
@@ -44,7 +43,7 @@
                 
             },
             {
-                _id: 3,
+                questionId: 3,
                 question: "How satisfied are you with the speed of your internet service?",
                 answerName: "service-speed",
                 answerType: "radio",
@@ -60,7 +59,7 @@
                 
             },
             {
-                _id: 4,
+                questionId: 4,
                 question: "Which of the following is this internet connection used for? (check all that apply)",
                 answerName: "uses",
                 answerType: "checkbox",
@@ -75,7 +74,7 @@
                 answer: []
             },
             {
-                _id: 5,
+                questionId: 5,
                 question: "High speed fiber internet would typically allow one person to be uploading and downloading multiple videos, music files and photos, a second person to watch a video (Hulu, Netflix, Amazon Prime), and a third person to be browsing and reading email, all at the same time. If high speed fiber internet were available at your location, how much per month would you be willing to pay?",
                 answerName: "cost",
                 answerType: "radio",
@@ -90,7 +89,7 @@
                 answer: []
             },
             {
-                _id: 6,
+                questionId: 6,
                 question: "Additional questions or feedback?",
                 answerName: "feedback",
                 answerType: "textarea",
@@ -107,12 +106,14 @@
             surveyInfo[questionNumber].answer = usesCheckboxAnswers;
         }
 
-        //@TODO: Need to handle "other" scenario for checkbox question. Currently stored in surveyInfo[x].other as a string
-
+        //@TODO: Need to handle "other" scenario for checkbox question. Currently stored in surveyInfo[x].other as a string        
+        const location = $currentTest.city ? $currentTest.city.split(',') : []
         let data = {
-                "userId": $page.data.userid,
+                "userID": $page.data.userid,
+                "speedTestID": $currentTest._id,
                 "date": new Date().toString(),
-                "city": currentTest.city ? currentTest.city : null,
+                "city": location[0],
+                "state": location[1],
                 "answers": surveyInfo.map(question => {
                     if (question.answerName === 'uses') {
                         //this is for the multi answer (checkbox)
@@ -150,6 +151,9 @@
         if (res.ok) {
             const success = await res.json();
             let testId = success.entryId;
+        } else {
+            const error = await res.json();
+            console.error(error)
         }
     };
 

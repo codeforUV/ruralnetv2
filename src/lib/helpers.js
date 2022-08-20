@@ -34,7 +34,6 @@ export const makeAuthenticatedReq = async (req, method) => {
 
 const cookies = () => {
 
-
   const setCookieStatus = (status) => {
 
     if (status === true || status === false) {

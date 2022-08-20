@@ -21,9 +21,7 @@ export async function GET({ request }) {
     const surveys = await SurveySubmissions.find({}).exec();
 
     if (surveys) {
-        return json$1({ surveys }, {
-          status: 201
-        })
+        return new Response(JSON.stringify(surveys), { status: 201 });
     } else {
         return new Response("No surveys found", { status: 404 });
     }
@@ -31,12 +29,14 @@ export async function GET({ request }) {
 }
 
 export async function POST({ request, url, params, locals, platform }) {
+    console.log('New Survey Submission');
 
     try {
 
         const data = await request.json();
         newSurvey = new SurveySubmissions(data);
         saved = await newSurvey.save();
+        
         if (saved === newSurvey) {
             return new Response(JSON.stringify({
                 resp: "Data saved successfully",
@@ -53,4 +53,7 @@ export async function POST({ request, url, params, locals, platform }) {
         
     
 }
-  
+
+// export async function DELETE({ request }) {
+//     SurveySubmissions.deleteMany({}).exec();
+// }
