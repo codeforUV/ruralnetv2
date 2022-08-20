@@ -152,6 +152,7 @@
             const success = await res.json();
             let testId = success.entryId;
         } else {
+            console.error(res)
             const error = await res.json();
             console.error(error)
         }
