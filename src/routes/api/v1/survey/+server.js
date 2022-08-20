@@ -43,11 +43,18 @@ export async function POST({ request, url, params, locals, platform }) {
                 entryId: newSurvey._id,
             }));
         } else {
-            return new Response(undefined, { status: 500 });
+            console.log('unexpected error in /Survey POST');
+            console.log('saved');
+            console.log(saved);
+            console.log('newSurvey');
+            console.log(newSurvey);
+            return new Response({msg: 'survey not saved'}, { status: 500 });
         }
 
     } catch (error) {
-        return new Response(JSON.stringify(error), { status: 500 });
+        console.log('Error in /Survey POST');
+        console.log(error);
+        return new Response({msg: JSON.stringify(error)}, { status: 500 });
     }
     
         
