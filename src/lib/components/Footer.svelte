@@ -20,8 +20,8 @@
 
       <li class='p-2'><a href="results">Results Map</a></li>
 
-    <li class='p-2'><a href="https://codeforuv.org/">Code for Upper Valley</a></li>
-    <li class='p-2'><a href="https://www.codeforamerica.org/">Code for America</a></li>
+    <li class='p-2'><a href="https://codeforuv.org/" target="_blank" rel="noopener noreferrer">Code for Upper Valley</a></li>
+    <li class='p-2'><a href="https://www.codeforamerica.org/" target="_blank" rel="noopener noreferrer">Code for America</a></li>
 
       <li class='p-2'><a href="privacy">Privacy policy</a></li>
 
