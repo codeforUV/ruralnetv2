@@ -124,7 +124,7 @@
                     } else {
                         return {
                             questionId: question.answerName,
-                            answer: question.answer
+                            answer: question.answer.toString()
                         }
                     }
                 })
@@ -302,10 +302,10 @@
         {/if}
         <div class="my-5 w-full flex justify-center">
             {#if questionNumber !== 0}
-                <button class="btn btn-secondary min-w-[50px] mx-2" on:click={prevQuestion}>←</button>
+                <button class="btn btn-secondary min-w-[50px] mx-2 text-3xl" on:click={prevQuestion}>←</button>
             {/if}
             {#if questionNumber !== (surveyInfo.length - 1)}
-                <button class="btn btn-secondary min-w-[50px] mx-2" on:click={nextQuestion}>→</button>
+                <button class="btn btn-secondary min-w-[50px] mx-2 text-3xl" on:click={nextQuestion}>→</button>
             {/if}
         </div>
         
