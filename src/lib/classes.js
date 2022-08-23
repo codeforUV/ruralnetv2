@@ -107,14 +107,12 @@ export class RuralTest {
     // request.headers['x-forwarded-for']. However, during the local dev server doesn't
     // return this info in the response header, so this is a workaround to hit the
     // abstract API which also gives us some approximate location info
-    this.addLogMsg(
-      "Getting user IP and approximate location from Abstract API"
-    );
+    this.addLogMsg("Getting user IP");
     try {
-      const resp = await fetch(
-        `https://ipgeolocation.abstractapi.com/v1/?api_key=${this.ABSTRACT_API}`
-      );
-      this.geolocationData = await resp.json();
+      const resp = await fetch("/api/v1/getIP");
+      this.geolocationData = {};
+      this.geolocationData.ip_address = await resp.json();
+      console.log(this.geolocationData);
       return true;
     } catch (error) {
       this.testData.errorText = `Failed to get IP and approximate location from abstract API: ${error}`;
