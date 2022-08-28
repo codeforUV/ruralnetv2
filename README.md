@@ -1,6 +1,6 @@
 # RuralNetV2
 
-*This project is a port of the old [RuralNet](https://github.com/codeforUV/ruralnet.git) from Sapper to SvelteKit. It is currently deployed at https://codeforuv-ruralnetv2.herokuapp.com/*
+*This project is a port of the old [RuralNet](https://github.com/codeforUV/ruralnet.git) from Sapper to SvelteKit. It is currently deployed at http://ruralnet.codeforuv.org/*
 
 ## Useful Links
 - [Project Task Board](https://www.notion.so/codeforuv/Transition-to-SvelteKit-4d93a45a1772440e84476b5d7995d68e)
