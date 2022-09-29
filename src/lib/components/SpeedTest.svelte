@@ -99,6 +99,7 @@
     loading = true;
     showStartButton = false;
     showLastTestDate = false;
+    showSurveyButton = false;
     headerText = "In Progress";
     await speedTest.startTest();
   };
@@ -150,6 +151,10 @@
       {/if}
       {#if showSurveyButton}
         <div class="">
+          <button
+            class="btn btn-success"
+            on:click={startTest}>Take Another Test</button
+          >
           <button
             class="btn btn-info"
             on:click={startSurvey}>Take a Quick Survey!</button
