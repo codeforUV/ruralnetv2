@@ -7,3 +7,7 @@ export const currentTest = writable({
   state: "not started",
   isPrevTest: false,
 });
+
+export const cookies = writable({
+  accepted: null
+})

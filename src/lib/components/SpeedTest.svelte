@@ -7,6 +7,8 @@
   import { RuralTest } from "$lib/classes.js";
   import { page } from '$app/stores';
   import { currentTest } from "$lib/stores";
+  import { cookies } from "$lib/stores";
+  import { useCookies } from '$lib/helpers'
 
   import Survey from "./Survey.svelte";
   import LoadingSpinner from "./LoadingSpinner.svelte";
@@ -41,6 +43,14 @@
   // real-time
   $: {
     if (!$currentTest.error) {
+      if (!useCookies.getCookieStatus()) {
+        showStartButton = true;
+        showSurveyButton = false;
+        showLastTestDate = false;
+        showSurvey = false;
+        showLocationVerify = false;
+        buttonText = "Start";
+      } else 
       if ($currentTest.isPrevTest) {
         loading = false;
         showStartButton = true;
@@ -67,7 +77,12 @@
 
   onMount(() => {
     // Check local storage for a last test result and display it if we have one
-    speedTest.checkLocalForPrevTest();
+    if (useCookies.getCookieStatus() === true) {
+      speedTest.checkLocalForPrevTest();
+    } else {
+      console.log('reset test');
+      speedTest.resetLocalTest()
+    }
   });
 
   // Because it takes a few seconds for the sveltestore to get set after a new speeed

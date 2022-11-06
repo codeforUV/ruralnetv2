@@ -4,6 +4,7 @@
  */
 
  import { parse, serialize } from "cookie";
+ import { cookies } from "$lib/stores";
 
 
 // Make an authenticated request against the /api/db endpoint by setting the value of
@@ -32,7 +33,8 @@ export const makeAuthenticatedReq = async (req, method) => {
   return fetch(url, options);
 };
 
-const cookies = () => {
+const useCookiesFunctions = () => {
+
   /**
    * 
    * @param {Boolean} status Accepts Boolean values for if Cookies have been accepted. 'true' mean Cookies have been accepted. 'false' means Cookies have been declined.
@@ -41,6 +43,7 @@ const cookies = () => {
 
     if (status === true || status === false) {
       document.cookie = `_rn_cookie_status=${status}`
+      cookies.accepted = status
     } else {
       console.error("Invalid value for cookie status. Must be 'true' or 'false'.")
     }
@@ -51,8 +54,29 @@ const cookies = () => {
    * @returns {Boolean} Returns 'true' or 'false' in relation to Cookies being accepted. 'true' mean Cookies have been accepted. 'false' means Cookies have been declined.
    */
   const getCookieStatus = () => {
-    let cookies = parse(document.cookie)
-    return cookies._rn_cookie_status
+    let cookiesObj
+    try {
+        cookiesObj = parse(document.cookie)
+      
+      
+      if (cookiesObj._rn_cookie_status === 'true') {
+        return true
+      } else if (cookiesObj._rn_cookie_status === 'false') {
+        return false
+      } else {
+        return true
+      }
+
+    } catch (error) { //Catch in case 'document' is not accessible, then default to store
+      
+      if (cookies.accepted === true) {
+        return true
+      } else if (cookies.accepted === false) {
+        return false
+      } else {
+        return false
+      }
+    }
   }
 
   return {
@@ -61,4 +85,4 @@ const cookies = () => {
   }
 }
 
-export const useCookies = cookies()
+export const useCookies = useCookiesFunctions()

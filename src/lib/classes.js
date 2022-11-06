@@ -101,6 +101,23 @@ export class RuralTest {
     }
   }
 
+  resetLocalTest() {
+    window.localStorage.removeItem("ruralnet-recentTest");
+    window.localStorage.removeItem("ruralnet-recentTestDate");
+
+    const blankTest = {
+      downloadSpeed: 0,
+      uploadSpeed: 0,
+      ping: 0,
+      state: "not started",
+      isPrevTest: false,
+    }
+
+    this.testData = blankTest
+    currentTest.set(blankTest);
+    
+  }
+
   async getIPAndApproxLocation() {
     // NOTE: We actually have access to the request headers when the app is deployed
     // live using the node-adapter on Heroku. It's available in
