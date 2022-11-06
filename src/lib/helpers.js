@@ -33,7 +33,10 @@ export const makeAuthenticatedReq = async (req, method) => {
 };
 
 const cookies = () => {
-
+  /**
+   * 
+   * @param {Boolean} status Accepts Boolean values for if Cookies have been accepted. 'true' mean Cookies have been accepted. 'false' means Cookies have been declined.
+   */
   const setCookieStatus = (status) => {
 
     if (status === true || status === false) {
@@ -43,7 +46,10 @@ const cookies = () => {
     }
 
   }
-
+  /**
+   * 
+   * @returns {Boolean} Returns 'true' or 'false' in relation to Cookies being accepted. 'true' mean Cookies have been accepted. 'false' means Cookies have been declined.
+   */
   const getCookieStatus = () => {
     let cookies = parse(document.cookie)
     return cookies._rn_cookie_status
