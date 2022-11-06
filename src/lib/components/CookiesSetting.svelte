@@ -10,12 +10,12 @@
   
     function setAccept() {
         useCookies.setCookieStatus(true)
-        cookiesAccepted = 'true'
+        cookiesAccepted = true
     }
   
     function setDecline() {
         useCookies.setCookieStatus(false)
-        cookiesAccepted = 'false'
+        cookiesAccepted = false
     }
 
 </script>
@@ -35,12 +35,12 @@
 
 <div class='flex'>
     <div>
-        {#if cookiesAccepted == 'true'}
+        {#if cookiesAccepted == true}
             <div>Cookies Status: Accepted</div>
-            <button class='btn btn-info' on:click={setDecline}>Decline Cookies</button>
-        {:else if cookiesAccepted == 'false'}
+            <button class='btn btn-error' on:click={setDecline}>Decline Cookies</button>
+        {:else if cookiesAccepted == false}
             <div>Cookies Status: Declined</div>
-            <button class='btn btn-error' on:click={setAccept}>Accept Cookies</button>
+            <button class='btn btn-info' on:click={setAccept}>Accept Cookies</button>
         {:else }
             <div>Cookies Status: Undecided</div>
             <button class='btn btn-info' on:click={setAccept}>Accept Cookies</button>
