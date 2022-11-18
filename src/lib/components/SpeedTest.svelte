@@ -50,21 +50,33 @@
         showSurvey = false;
         showLocationVerify = false;
         buttonText = "Start";
-      } else 
-      if ($currentTest.isPrevTest) {
-        loading = false;
-        showStartButton = true;
-        showSurveyButton = false;
-        showLastTestDate = true;
-        headerText = "Welcome Back!";
-        buttonText = "Take another test";
-      } else if ($currentTest.state === "not started") {
-        headerText = "Internet Speed Test";
-      } else if ($currentTest.state === "finished") {
-        headerText = "Complete";
-        loading = false;
-        showSurveyButton = true;
-        showLastTestDate = true;
+        console.log($currentTest.state);
+        if ($currentTest.state === "not started") {
+          headerText = "Internet Speed Test";
+        } else if ($currentTest.state === "download" || $currentTest.state === "upload") {
+          showStartButton = false;
+        } else if ($currentTest.state === "finished") {
+          headerText = "Complete";
+          loading = false;
+          showSurveyButton = true;
+          showLastTestDate = true;
+        }
+      } else {
+        if ($currentTest.isPrevTest) {
+          loading = false;
+          showStartButton = true;
+          showSurveyButton = false;
+          showLastTestDate = true;
+          headerText = "Welcome Back!";
+          buttonText = "Take another test";
+        } else if ($currentTest.state === "not started") {
+          headerText = "Internet Speed Test";
+        } else if ($currentTest.state === "finished") {
+          headerText = "Complete";
+          loading = false;
+          showSurveyButton = true;
+          showLastTestDate = true;
+        }
       }
     } else {
       loading = false;
