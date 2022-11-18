@@ -60,6 +60,7 @@
           loading = false;
           showSurveyButton = true;
           showLastTestDate = true;
+          showStartButton = false;
         }
       } else {
         if ($currentTest.isPrevTest) {
