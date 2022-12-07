@@ -7,7 +7,7 @@
 
     onMount(() => {
         cookiesAccepted = useCookies.getCookieStatus()
-        if(cookiesAccepted !== true && cookiesAccepted !== false) {
+        if(cookiesAccepted === null) {
             show = true
         }
     });
