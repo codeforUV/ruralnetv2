@@ -58,13 +58,13 @@ const useCookiesFunctions = () => {
     try {
         cookiesObj = parse(document.cookie)
       
-      
       if (cookiesObj._rn_cookie_status === 'true') {
         return true
       } else if (cookiesObj._rn_cookie_status === 'false') {
         return false
       } else {
-        return true
+        // cookiesObj not set yet
+        return null
       }
 
     } catch (error) { //Catch in case 'document' is not accessible, then default to store
@@ -74,7 +74,7 @@ const useCookiesFunctions = () => {
       } else if (cookies.accepted === false) {
         return false
       } else {
-        return false
+        return null
       }
     }
   }
