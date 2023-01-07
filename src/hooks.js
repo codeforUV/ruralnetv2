@@ -1,6 +1,6 @@
 import { parse, serialize } from "cookie";
 import { v4 as uuid } from "@lukeed/uuid";
-import { dev } from "$app/env";
+import { dev } from "$app/environment";
 import mongoose from "mongoose";
 
 // First try reading the mongodb URI from the currently running node process
