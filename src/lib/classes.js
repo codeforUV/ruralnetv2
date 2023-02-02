@@ -80,7 +80,12 @@ export class RuralTest {
     // other account info. Worse case we run out of free monthly quota
     // Replace this when we get easily get client request IP in sveltekit. See:
     // https://github.com/sveltejs/kit/pull/3993
-    this.ABSTRACT_API = "de24077830ea4d369cb85de93599c45c";
+
+    // key for account using ruralnet@codeforuv.org
+    // this.ABSTRACT_API = "de24077830ea4d369cb85de93599c45c";
+
+    // key for account using lynn.jms@gmail.com
+    this.ABSTRACT_API = "24b20bbcf9d1412e9deae17b60cd692a";
   }
 
   addLogMsg(msg) {
@@ -111,11 +116,10 @@ export class RuralTest {
       ping: 0,
       state: "not started",
       isPrevTest: false,
-    }
+    };
 
-    this.testData = blankTest
+    this.testData = blankTest;
     currentTest.set(blankTest);
-    
   }
 
   async getIPAndApproxLocation() {
