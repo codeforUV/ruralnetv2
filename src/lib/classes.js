@@ -133,7 +133,7 @@ export class RuralTest {
     );
     try {
       const resp = await fetch(
-        `https://ipgeolocation.abstractapi.com/v1/?api_key=${this.ABSTRACT_API}`
+        `https://ipgeolocation.abstractapi.com/v1/?api_key=${this.ABSTRACT_API} & ip_address = "2600:4040:5714:3a00:d98d:8499:e47e:a240"`
       );
       this.geolocationData = await resp.json();
       return true;
