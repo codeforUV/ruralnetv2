@@ -30,7 +30,6 @@
         <a href="/" class="py-3">Home</a>
         <a href="about" class="py-3">About</a>
         <a href="results" class="py-3">Results</a>
-        <a href="/" class="py-3">API Fix 1</a>
       </ul>
     </div>
     <a href="/" class="m-1 font-bold text-xl flex-none">RuralNet</a>
@@ -42,6 +41,7 @@
     <a href="/" class="p-3">Home</a>
     <a href="about" class="p-3">About</a>
     <a href="results" class="p-3">Results</a>
+    <a href="/" class="py-3">API Fix 1</a>
   </div>
 
   {#if $page.url.pathname !== "/"}
