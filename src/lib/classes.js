@@ -147,7 +147,7 @@ export class RuralTest {
     this.addLogMsg("Checking db for existing test for this IP + userid");
     try {
       const previousTestReq = await fetch(
-        `/api/v1/findUser?ip=${this.geolocationData.ip_address}`
+        `/api/v1/findUser?ip=${this.geolocationData?.ip_address}`
       );
       let prevTestMeta = await previousTestReq.json();
       if (!prevTestMeta.err) {
@@ -161,9 +161,9 @@ export class RuralTest {
         this.testData.longitude = prevTestMeta.longitude;
       } else {
         this.addLogMsg("No document found...setting up first time test");
-        this.testData.ipAddress = this.geolocationData.ip_address;
+        this.testData.ipAddress = this.geolocationData?.ip_address;
         this.testData.internetProvider =
-          this.geolocationData.connection.isp_name;
+          this.geolocationData?.connection?.isp_name;
         this.testData.latitude = parseFloat(this.geolocationData.latitude);
         this.testData.longitude = parseFloat(this.geolocationData.longitude);
         this.testData.city = `${this.geolocationData.city}, ${this.geolocationData.region_iso_code}`;
