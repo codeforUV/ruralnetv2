@@ -1,6 +1,5 @@
 # RuralNetV2
-
-https://codeforuv-ruralnetv2.herokuapp.com/
+Website: https://codeforuv-ruralnetv2.herokuapp.com/
 
 ## Useful Links
 - [Project Task Board](https://www.notion.so/codeforuv/Transition-to-SvelteKit-4d93a45a1772440e84476b5d7995d68e)
