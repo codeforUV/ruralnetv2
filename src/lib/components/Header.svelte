@@ -41,7 +41,7 @@
     <a href="/" class="p-3">Home</a>
     <a href="about" class="p-3">About</a>
     <a href="results" class="p-3">Results</a>
-    <a href="/" class="py-3">API Fix 2</a>
+    <a href="/" class="py-3">API Fix 3</a>
   </div>
 
   {#if $page.url.pathname !== "/"}
