@@ -61,7 +61,8 @@
     {#if showAddressInput}
       What city and state are you in?
     {:else}
-      Is this your location? <br/> <span class="italic font-semibold">{$currentTest.city}</span>
+      Is this your location? <br />
+      <span class="italic font-semibold">{$currentTest.city}</span>
     {/if}
   </div>
   <div class="flex justify-center">
@@ -75,12 +76,11 @@
             required
             placeholder={$currentTest.city}
           />
-          <button
-            class="btn"
-            type="submit">Submit</button
-          >
+          <button class="btn" type="submit">Submit</button>
         </form>
-        <div class='link' on:click={() => (showAddressInput = false)}>Back</div>
+        <div class="link" on:keypress={() => (showAddressInput = false)}>
+          Back
+        </div>
         {#if errorText}
           <p class="mt-4 text-sm italic text-red-500">{errorText}</p>
         {/if}
@@ -90,9 +90,8 @@
         class="btn btn-error min-w-[100px] m-1"
         on:click={() => (showAddressInput = true)}>Not quite</button
       >
-      <button
-    class="btn btn-success min-w-[100px] m-1"
-        on:click={startTest}>Yes</button
+      <button class="btn btn-success min-w-[100px] m-1" on:click={startTest}
+        >Yes</button
       >
     {/if}
   </div>

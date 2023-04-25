@@ -1,18 +1,11 @@
 import preprocess from "svelte-preprocess";
 import adapter from "@sveltejs/adapter-node";
+import appengine from "svelte-adapter-appengine";
 
 /** @type {import('@sveltejs/kit').Config} */
-const config = {
+export default {
   kit: {
-    adapter: adapter({
-      envPrefix: '',
-      
-    }),
-    // vite: {
-    //   define: {
-    //     "process.env": process.env,
-    //   },
-    // },
+    adapter: appengine(),
   },
 
   preprocess: [
@@ -21,5 +14,3 @@ const config = {
     }),
   ],
 };
-
-export default config;

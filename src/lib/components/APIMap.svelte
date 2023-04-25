@@ -1,6 +1,6 @@
 <script>
   import { onMount } from "svelte";
-  import { browser } from "$app/env";
+  import { browser } from "$app/environment";
 
   export let data = [];
 
@@ -15,7 +15,7 @@
         `;
   };
 
-  let map = null
+  let map = null;
 
   onMount(async () => {
     if (browser) {
@@ -42,7 +42,9 @@
         }
       };
 
-      map = leaflet.map("map", {scrollWheelZoom: false}).setView([43.827, -72.295], 10);
+      map = leaflet
+        .map("map", { scrollWheelZoom: false })
+        .setView([43.827, -72.295], 10);
 
       leaflet
         .tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -51,8 +53,8 @@
         })
         .addTo(map);
 
-      if (data) {
-        data.map((speedTest) => {
+      if (data.data) {
+        data.data.map((speedTest) => {
           if (speedTest.latitude && speedTest.longitude) {
             const popupContent = getPopupContent(speedTest);
 
@@ -69,13 +71,14 @@
   });
 
   const handleResize = () => {
-    setTimeout(function(){ map.invalidateSize()}, 310)
-  } 
-  
+    setTimeout(function () {
+      map.invalidateSize();
+    }, 310);
+  };
 </script>
+
+<div id="map" class="min-h-full min-w-full z-0" on:mouseenter={handleResize} />
 
 <style>
   @import "https://unpkg.com/leaflet@1.7.1/dist/leaflet.css";
 </style>
-
-<div id="map" class="min-h-full min-w-full z-0" on:mouseenter={handleResize} />

@@ -1,27 +1,18 @@
 <script context="module">
-  import { browser, dev } from "$app/env";
+  import { browser, dev } from "$app/environment";
 
   // we don't need any JS on this page, though we'll load
   // it in dev so that we get hot module replacement...
-  export const hydrate = dev;
+  export const _hydrate = dev;
 
   // ...but if the client-side router is already loaded
   // (i.e. we came here from elsewhere in the app), use it
-  export const router = browser;
+  export const _router = browser;
 
   // since there's no dynamic data here, we can prerender
   // it so that it gets served as a static asset in prod
-  export const prerender = true;
+  export const _prerender = true;
 </script>
-
-<style>
-  p {
-    @apply text-lg mb-4;
-  }
-  a {
-    @apply text-blue-400 hover:text-blue-600;
-  }
-</style>
 
 <svelte:head>
   <title>About</title>
@@ -56,3 +47,12 @@
 
   <p>Click here for the <a href="/privacy">Privacy Page</a></p>
 </div>
+
+<style>
+  p {
+    @apply text-lg mb-4;
+  }
+  a {
+    @apply text-blue-400 hover:text-blue-600;
+  }
+</style>

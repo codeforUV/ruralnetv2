@@ -41,9 +41,9 @@ const SurveySubmissionsSchema = new Schema({
   ],
 });
 
-const SpeedTest = mongoose.model("SpeedTest", SpeedTestSchema);
-const SurveySubmissions = mongoose.model(
-  "SurveySubmissions",
-  SurveySubmissionsSchema
-);
+const SpeedTest =
+  mongoose.models.SpeedTest || mongoose.model("SpeedTest", SpeedTestSchema);
+const SurveySubmissions =
+  mongoose.models.SurveySubmissions ||
+  mongoose.model("SurveySubmissions", SurveySubmissionsSchema);
 export { SpeedTest, SurveySubmissions };
