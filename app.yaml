@@ -3,7 +3,8 @@ runtime: nodejs16 # or another supported version
 instance_class: F2
 
 env_variables:
-  BUCKET_NAME: "ruralnetv2-gcs-bucket"
+  MAPQUEST_KEY: "replace_with_key_before_deploy"
+  MONGODB_URI: "replace_with_uri_before_deploy"
 
 handlers:
   - url: /stylesheets
