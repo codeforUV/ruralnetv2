@@ -3,7 +3,6 @@
   import ApiMap from "$lib/components/APIMap.svelte";
 
   export let data = [];
-
 </script>
 
 <svelte:head>
@@ -14,12 +13,12 @@
   <h1 class="text-4xl mb-6">Test Results</h1>
 </div>
 
-
-
-<div class='flex justify-center'>
-  <div class='w-full lg:w-1/2 lg:hover:transition-width lg:hover:w-full duration-300' >
-  <div class='p-4 w-full h-[75vh] lg:w-full ' id='mapContainer'>
-    <ApiMap {data} />
+<div class="flex justify-center">
+  <div
+    class="w-full lg:w-1/2 lg:hover:transition-width lg:hover:w-full duration-300"
+  >
+    <div class="p-4 w-full h-[75vh] lg:w-full" id="mapContainer">
+      <ApiMap {data} />
+    </div>
   </div>
-</div>
 </div>

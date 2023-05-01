@@ -8,7 +8,8 @@
 <nav class="navbar bg-base-100 flex-wrap">
   <div class="flex-1 md:hidden">
     <div class="dropdown flex-1">
-      <label tabindex="0" class="btn btn-ghost btn-circle">
+      <!-- svelte-ignore a11y-label-has-associated-control -->
+      <label class="btn btn-ghost btn-circle">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           class="h-5 w-5"
@@ -24,7 +25,6 @@
         >
       </label>
       <ul
-        tabindex="0"
         class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
       >
         <a href="/" class="py-3">Home</a>
@@ -41,7 +41,6 @@
     <a href="/" class="p-3">Home</a>
     <a href="about" class="p-3">About</a>
     <a href="results" class="p-3">Results</a>
-    <a href="/" class="py-3">API Fix 3</a>
   </div>
 
   {#if $page.url.pathname !== "/"}

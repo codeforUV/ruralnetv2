@@ -19,8 +19,5 @@ export async function load({ fetch }) {
     }
   );
 
-  return data
-  
-  
-} 
-
+  return { data };
+}
